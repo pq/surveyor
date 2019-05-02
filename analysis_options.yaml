@@ -1,0 +1,22 @@
+# Defines a default set of lint rules enforced for
+# projects at Google. For details and rationale,
+# see https://github.com/dart-lang/pedantic#enabled-lints.
+include: package:pedantic/analysis_options.yaml
+
+linter:
+   rules:
+     - annotate_overrides
+     - camel_case_types
+     - empty_constructor_bodies
+     - empty_statements
+     - hash_and_equals
+     - non_constant_identifier_names
+     - prefer_expression_function_bodies
+     - slash_for_doc_comments
+     - test_types_in_equals
+     - throw_in_finally
+     - type_init_formals
+     - unnecessary_brace_in_string_interps
+     - unnecessary_lambdas
+     - unnecessary_statements
+     - unnecessary_this
