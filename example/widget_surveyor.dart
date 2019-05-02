@@ -17,8 +17,8 @@ class TwoGram implements Comparable<TwoGram> {
   String child;
 
   TwoGram(DartType parent, DartType child)
-      : this.parent = parent?.name ?? 'null',
-        this.child = child?.name ?? 'null';
+      : parent = parent?.name ?? 'null',
+        child = child?.name ?? 'null';
 
   @override
   String toString() => '$child->$parent';
