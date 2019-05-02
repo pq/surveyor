@@ -52,7 +52,7 @@ class TwoGrams {
     var sb = StringBuffer();
     for (var entry in map.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key))) {
-      sb.writeln('${entry.key} : ${entry.value}');
+      sb.writeln('${entry.key},${entry.value}');
     }
     return sb.toString();
   }
