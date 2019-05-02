@@ -33,3 +33,12 @@ Text->Column : 5
 ```
 
 (Note that by default package dependencies will only be installed if a `.packages` file is absent from the project under analysis.  If you want to make sure package dependencies are (re)installed, run with the `--force-install` option.)
+
+
+## Features and bugs
+
+This is very much a work in progress.  Please file feature requests, bugs and any feedback in the [issue tracker][tracker].
+
+Thanks!
+
+[tracker]: https://github.com/pq/surveyor/issues
