@@ -5,6 +5,11 @@ import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
 
+/// Gathers and displays widget 2-grams.
+///
+/// Run like so:
+///
+/// dart bin/widget_surveyor.dart <source dir>
 main(List<String> args) async {
   var driver = Driver.forArgs(args);
   driver.visitor = WidgetCollector();
