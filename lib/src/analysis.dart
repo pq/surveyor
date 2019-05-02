@@ -19,7 +19,6 @@ final Map<String, int> _severityCompare = {
 };
 
 bool implementsInterface(DartType type, String interface, String library) {
-
   if (type is! InterfaceType) {
     return false;
   }

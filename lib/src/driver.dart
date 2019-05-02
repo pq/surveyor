@@ -31,15 +31,13 @@ class Driver {
 
   bool showErrors = true;
 
-  bool get forcePackageInstall => options.forceInstall;
-
-  /// Hook for custom error filtering.
-  bool showError(AnalysisError element) => true;
-
-  /// Hook to influence context before analysis.
-  void preAnalyze(AnalysisContext context) {}
-
   final List<String> sources;
+
+  Driver(ArgResults argResults)
+      : options = CommandLineOptions.fromArgs(argResults),
+        sources = argResults.rest
+            .map((p) => path.normalize(io.File(p).absolute.path))
+            .toList();
 
   factory Driver.forArgs(List<String> args) {
     var argParser = ArgParser()
@@ -50,15 +48,17 @@ class Driver {
     return Driver(argResults);
   }
 
-  Driver(ArgResults argResults)
-      : options = CommandLineOptions.fromArgs(argResults),
-        sources = argResults.rest
-            .map((p) => path.normalize(io.File(p).absolute.path))
-            .toList();
+  bool get forcePackageInstall => options.forceInstall;
 
   Future analyze({bool forceInstall}) => _analyze(sources);
 
-  Future _analyze(List<String> sourceDirs,{bool forceInstall}) async {
+  /// Hook to influence context before analysis.
+  void preAnalyze(AnalysisContext context) {}
+
+  /// Hook for custom error filtering.
+  bool showError(AnalysisError element) => true;
+
+  Future _analyze(List<String> sourceDirs, {bool forceInstall}) async {
     if (sourceDirs.isEmpty) {
       print('Specify one or more files and directories.');
       return;

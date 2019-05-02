@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'common.dart';
@@ -8,10 +7,6 @@ abstract class AnalysisOptionsVisitor {
   void visit(AnalysisOptionsFile file) {}
 }
 
-abstract class PostVisitCallback {
-  void onVisitFinished();
-}
-
 class OptionsVisitor extends AnalysisOptionsVisitor {
   @override
   void visit(AnalysisOptionsFile options) {
@@ -19,18 +14,23 @@ class OptionsVisitor extends AnalysisOptionsVisitor {
   }
 }
 
-class PubspecVisitor extends PubspecFileVisitor {
-  @override
-  void visit(PubspecFile pubspec) {
-//    print('>> visiting: ${pubspec.file}');
-  }
+/// A simple visitor for package roots.
+abstract class PackageRootVisitor {
+  void visit(Directory root) {}
 }
+
+abstract class PostVisitCallback {
+  void onVisitFinished();
+}
+
 /// A simple visitor for pubspec files.
 abstract class PubspecFileVisitor {
   void visit(PubspecFile file) {}
 }
 
-/// A simple visitor for package roots.
-abstract class PackageRootVisitor {
-  void visit(Directory root) {}
+class PubspecVisitor extends PubspecFileVisitor {
+  @override
+  void visit(PubspecFile pubspec) {
+//    print('>> visiting: ${pubspec.file}');
+  }
 }

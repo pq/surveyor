@@ -26,9 +26,6 @@ class TwoGram implements Comparable<TwoGram> {
         child = child?.name ?? 'null';
 
   @override
-  String toString() => '$child->$parent';
-
-  @override
   int get hashCode => child.hashCode * 13 + parent.hashCode;
 
   @override
@@ -38,6 +35,9 @@ class TwoGram implements Comparable<TwoGram> {
   @override
   int compareTo(TwoGram other) =>
       child.compareTo(other.child) * 2 + parent.compareTo(other.parent);
+
+  @override
+  String toString() => '$child->$parent';
 }
 
 class TwoGrams {
@@ -65,6 +65,12 @@ class WidgetCollector extends RecursiveAstVisitor implements PostVisitCallback {
   DartType enclosingWidget;
 
   @override
+  void onVisitFinished() {
+    print('2 Grams:');
+    print(twoGrams);
+  }
+
+  @override
   visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
@@ -78,11 +84,5 @@ class WidgetCollector extends RecursiveAstVisitor implements PostVisitCallback {
 
     // Reset parent.
     enclosingWidget = previousEnclosingWidget;
-  }
-
-  @override
-  void onVisitFinished() {
-    print('2 Grams:');
-    print(twoGrams);
   }
 }
