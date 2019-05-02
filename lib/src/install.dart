@@ -43,7 +43,7 @@ class Package {
   final Directory dir;
   Package(String path) : dir = Directory(path);
 
-  Future<bool> installDependencies({bool force : false}) async {
+  Future<bool> installDependencies({bool force = false}) async {
     if (!force && _installer.hasDependenciesInstalled(this)) {
       return false;
     }
@@ -51,8 +51,7 @@ class Package {
     await _installer.installDependencies(this);
     return true;
   }
-  
-  @override
+
   Map<dynamic, yaml.YamlNode> get pubspec {
     final pubspecFile = File('${dir.path}/pubspec.yaml');
     if (pubspecFile.existsSync()) {

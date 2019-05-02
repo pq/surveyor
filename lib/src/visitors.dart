@@ -1,8 +1,6 @@
 
 import 'dart:io';
 
-import 'package:analyzer/dart/ast/visitor.dart';
-
 import 'common.dart';
 
 /// A simple visitor for analysis options files.
