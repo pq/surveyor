@@ -1,14 +1,19 @@
 # 📐 surveyor
 Tools for surveying Dart packages
 
+## Installing
+
+These tools are best run from source.  To get the sources, clone the `suveyor` repo like this:
+
+    $ git clone https://github.com/pq/surveyor.git
+
+From there you can run the `examples`.
 
 ## Examples
 
 ### Surveying Widget Use
 
-```
-> dart bin/example/survey_widgets.dart <path_to_project>
-```
+    dart bin/example/survey_widgets.dart <path_to_project>
 
 will analyze the project at the given path and present a list of found `Widget` child-parent 2-Grams.
 
