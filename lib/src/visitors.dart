@@ -24,13 +24,6 @@ abstract class PostVisitCallback {
 }
 
 /// A simple visitor for pubspec files.
-abstract class PubspecFileVisitor {
+abstract class PubspecVisitor {
   void visit(PubspecFile file) {}
-}
-
-class PubspecVisitor extends PubspecFileVisitor {
-  @override
-  void visit(PubspecFile pubspec) {
-//    print('>> visiting: ${pubspec.file}');
-  }
 }
