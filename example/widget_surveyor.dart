@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
@@ -11,8 +14,16 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// dart bin/widget_surveyor.dart <source dir>
 main(List<String> args) async {
-  var driver = Driver.forArgs(args);
-  driver.visitor = WidgetCollector();
+  if (args.length != 1) {
+    print('a single target source directory is expected');
+    print('for example:');
+    print('  dart bin/widget_surveyor.dart <path_to_dir>');
+    return;
+  }
+
+  final driver = Driver.forArgs(args);
+  final dirName = path.basename(args.first);
+  driver.visitor = WidgetCollector(dirName);
 
   await driver.analyze();
 }
@@ -64,10 +75,14 @@ class WidgetCollector extends RecursiveAstVisitor implements PostVisitCallback {
   DartType previousEnclosingWidget;
   DartType enclosingWidget;
 
+  final String dirName;
+  WidgetCollector(this.dirName);
+
   @override
   void onVisitFinished() {
-    print('2 Grams:');
-    print(twoGrams);
+    final fileName = '${dirName}_2gram.csv';
+    print('Writing 2-Grams to "$fileName"...');
+    File(fileName).writeAsStringSync(twoGrams.toString());
   }
 
   @override
