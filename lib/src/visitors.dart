@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/analysis_context.dart';
+
 import 'common.dart';
 
 /// A simple visitor for analysis options files.
@@ -21,6 +23,14 @@ abstract class PackageRootVisitor {
 
 abstract class PostVisitCallback {
   void onVisitFinished();
+}
+
+abstract class PreAnalysisCallback {
+  void preAnalysis(AnalysisContext context);
+}
+
+abstract class PostAnalysisCallback {
+  void postAnalysis(AnalysisContext context);
 }
 
 /// A simple visitor for pubspec files.

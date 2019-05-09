@@ -53,7 +53,18 @@ class Driver {
   Future analyze({bool forceInstall}) => _analyze(sources);
 
   /// Hook to influence context before analysis.
-  void preAnalyze(AnalysisContext context) {}
+  void preAnalyze(AnalysisContext context) {
+    if (visitor is PreAnalysisCallback) {
+      (visitor as PreAnalysisCallback).preAnalysis(context);
+    }
+  }
+
+  /// Hook to influence context before analysis.
+  void postAnalyze(AnalysisContext context) {
+    if (visitor is PostAnalysisCallback) {
+      (visitor as PostAnalysisCallback).postAnalysis(context);
+    }
+  }
 
   /// Hook for custom error filtering.
   bool showError(AnalysisError element) => true;
@@ -120,6 +131,8 @@ class Driver {
           }
         }
       }
+
+      postAnalyze(context);
     }
 
     if (visitor is PostVisitCallback) {

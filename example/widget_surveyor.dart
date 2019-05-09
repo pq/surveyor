@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -14,16 +15,16 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// dart bin/widget_surveyor.dart <source dir>
 main(List<String> args) async {
-  if (args.length != 1) {
-    print('a single target source directory is expected');
-    print('for example:');
-    print('  dart bin/widget_surveyor.dart <path_to_dir>');
-    return;
+  if (args.length == 1) {
+    if (!File('$args/pubspec.yaml').existsSync()) {
+      final dir = args[0];
+      print('Recursing into "$dir"...');
+      args = Directory(dir).listSync().map((f) => f.path).toList();
+    }
   }
 
   final driver = Driver.forArgs(args);
-  final dirName = path.basename(args.first);
-  driver.visitor = WidgetCollector(dirName);
+  driver.visitor = WidgetCollector();
 
   await driver.analyze();
 }
@@ -69,20 +70,19 @@ class TwoGrams {
   }
 }
 
-class WidgetCollector extends RecursiveAstVisitor implements PostVisitCallback {
+class WidgetCollector extends RecursiveAstVisitor
+    implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
   TwoGrams twoGrams = TwoGrams();
 
   DartType previousEnclosingWidget;
   DartType enclosingWidget;
 
-  final String dirName;
-  WidgetCollector(this.dirName);
+  String dirName;
+  WidgetCollector();
 
   @override
   void onVisitFinished() {
-    final fileName = '${dirName}_2gram.csv';
-    print('Writing 2-Grams to "$fileName"...');
-    File(fileName).writeAsStringSync(twoGrams.toString());
+    //TODO: generate summary here.
   }
 
   @override
@@ -99,5 +99,18 @@ class WidgetCollector extends RecursiveAstVisitor implements PostVisitCallback {
 
     // Reset parent.
     enclosingWidget = previousEnclosingWidget;
+  }
+
+  @override
+  void preAnalysis(AnalysisContext context) {
+    dirName = path.basename(context.contextRoot.root.path);
+    print('Analyzing "$dirName"...');
+  }
+
+  @override
+  void postAnalysis(AnalysisContext context) {
+    final fileName = '${dirName}_2gram.csv';
+    print('Writing 2-Grams to "${path.basename(fileName)}"...');
+    File(fileName).writeAsStringSync(twoGrams.toString());
   }
 }
