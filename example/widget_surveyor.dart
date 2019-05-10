@@ -16,8 +16,8 @@ import 'package:surveyor/src/visitors.dart';
 /// dart bin/widget_surveyor.dart <source dir>
 main(List<String> args) async {
   if (args.length == 1) {
-    if (!File('$args/pubspec.yaml').existsSync()) {
-      final dir = args[0];
+    final dir = args[0];
+    if (!File('$dir/pubspec.yaml').existsSync()) {
       print('Recursing into "$dir"...');
       args = Directory(dir).listSync().map((f) => f.path).toList();
     }
@@ -73,6 +73,7 @@ class TwoGrams {
 class WidgetCollector extends RecursiveAstVisitor
     implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
   TwoGrams twoGrams = TwoGrams();
+  Map<String, int> widgets = <String, int> {};
 
   DartType previousEnclosingWidget;
   DartType enclosingWidget;
@@ -82,13 +83,20 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void onVisitFinished() {
-    //TODO: generate summary here.
+    final fileName = '${dirName}_widget.csv';
+    print('Writing Widget counts to "${path.basename(fileName)}"...');
+    final sb = StringBuffer();
+    for (var entry in widgets.entries) {
+      sb.write('${entry.key}, ${entry.value}\n');
+    }
+    File(fileName).writeAsStringSync(sb.toString());
   }
 
   @override
   visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
+      widgets.update(type.name, (v) => v + 1, ifAbsent: () => 1);
       twoGrams.add(TwoGram(enclosingWidget, type));
       previousEnclosingWidget = enclosingWidget;
       enclosingWidget = type;
