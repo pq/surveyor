@@ -83,13 +83,7 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void onVisitFinished() {
-    final fileName = '${dirName}_widget.csv';
-    print('Writing Widget counts to "${path.basename(fileName)}"...');
-    final sb = StringBuffer();
-    for (var entry in widgets.entries) {
-      sb.write('${entry.key}, ${entry.value}\n');
-    }
-    File(fileName).writeAsStringSync(sb.toString());
+    // todo (pq): write summary info.
   }
 
   @override
@@ -117,8 +111,24 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void postAnalysis(AnalysisContext context) {
+    write2Grams();
+    writeWidgetCounts();
+  }
+
+  void write2Grams() {
     final fileName = '${dirName}_2gram.csv';
     print('Writing 2-Grams to "${path.basename(fileName)}"...');
     File(fileName).writeAsStringSync(twoGrams.toString());
+  }
+
+  void writeWidgetCounts() {
+    final fileName = '${dirName}_widget.csv';
+    print('Writing Widget counts to "${path.basename(fileName)}"...');
+    final sb = StringBuffer();
+
+    widgets.entries.forEach((entry) {
+      sb.write('${entry.key}, ${entry.value}\n');
+    });
+    File(fileName).writeAsStringSync(sb.toString());
   }
 }
