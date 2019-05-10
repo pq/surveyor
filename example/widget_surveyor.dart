@@ -73,7 +73,7 @@ class TwoGrams {
 class WidgetCollector extends RecursiveAstVisitor
     implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
   TwoGrams twoGrams = TwoGrams();
-  Map<String, int> widgets = <String, int> {};
+  Map<String, int> widgets = <String, int>{};
 
   DartType previousEnclosingWidget;
   DartType enclosingWidget;
