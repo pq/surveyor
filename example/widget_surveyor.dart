@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
@@ -75,8 +76,7 @@ class WidgetCollector extends RecursiveAstVisitor
   TwoGrams twoGrams = TwoGrams();
   Map<String, int> widgets = <String, int>{};
 
-  DartType previousEnclosingWidget;
-  DartType enclosingWidget;
+  ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
 
   String dirName;
   WidgetCollector();
@@ -91,16 +91,20 @@ class WidgetCollector extends RecursiveAstVisitor
     final type = node.staticType;
     if (isWidgetType(type)) {
       widgets.update(type.name, (v) => v + 1, ifAbsent: () => 1);
-      twoGrams.add(TwoGram(enclosingWidget, type));
-      previousEnclosingWidget = enclosingWidget;
-      enclosingWidget = type;
+
+      DartType parent =
+          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
+
+      twoGrams.add(TwoGram(parent, type));
+
+      enclosingWidgets.addFirst(type);
+
+      // Visit children.
+      super.visitInstanceCreationExpression(node);
+
+      // Reset parent.
+      enclosingWidgets.removeFirst();
     }
-
-    // Visit children.
-    super.visitInstanceCreationExpression(node);
-
-    // Reset parent.
-    enclosingWidget = previousEnclosingWidget;
   }
 
   @override
