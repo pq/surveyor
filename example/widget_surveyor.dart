@@ -38,7 +38,7 @@ class TwoGram implements Comparable<TwoGram> {
         child = child?.name ?? 'null';
 
   @override
-  int get hashCode => child.hashCode * 13 + parent.hashCode;
+  int get hashCode => parent.hashCode * 13 + child.hashCode;
 
   @override
   bool operator ==(other) =>
@@ -46,10 +46,10 @@ class TwoGram implements Comparable<TwoGram> {
 
   @override
   int compareTo(TwoGram other) =>
-      child.compareTo(other.child) * 2 + parent.compareTo(other.parent);
+      parent.compareTo(other.parent) * 2 + child.compareTo(other.child);
 
   @override
-  String toString() => '$child->$parent';
+  String toString() => '$parent -> $child';
 }
 
 class TwoGrams {
@@ -64,7 +64,7 @@ class TwoGrams {
     var sb = StringBuffer();
     for (var entry in map.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key))) {
-      sb.writeln('${entry.key},${entry.value}');
+      sb.writeln('${entry.key}, ${entry.value}');
     }
     return sb.toString();
   }
