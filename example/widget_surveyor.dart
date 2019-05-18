@@ -19,7 +19,7 @@ main(List<String> args) async {
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
-      print('Recursing into "$dir"...');
+      print("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList();
     }
   }
@@ -110,7 +110,7 @@ class WidgetCollector extends RecursiveAstVisitor
   @override
   void preAnalysis(AnalysisContext context) {
     dirName = path.basename(context.contextRoot.root.path);
-    print('Analyzing "$dirName"...');
+    print("Analyzing '$dirName'...");
   }
 
   @override
