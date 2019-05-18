@@ -43,12 +43,17 @@ class Driver {
     var argParser = ArgParser()
       ..addFlag('verbose', abbr: 'v', help: 'verbose output.')
       ..addFlag('force-install', help: 'force package (re)installation.')
+      ..addFlag('skip-install', help: 'skip package install checks.')
       ..addFlag('color', help: 'color output.');
     var argResults = argParser.parse(args);
     return Driver(argResults);
   }
 
+  bool forceSkipInstall = false;
+
   bool get forcePackageInstall => options.forceInstall;
+
+  bool get skipPackageInstall => forceSkipInstall || options.skipInstall;
 
   Future analyze({bool forceInstall}) => _analyze(sources);
 
@@ -86,9 +91,11 @@ class Driver {
   Future<List<ErrorsResult>> _analyzeFiles(
       ResourceProvider resourceProvider, List<String> analysisRoots) async {
     // Ensure dependencies are installed.
-    print('Checking dependencies...');
-    for (String dir in analysisRoots) {
-      await Package(dir).installDependencies(force: forcePackageInstall);
+    if (!skipPackageInstall) {
+      print('Checking dependencies...');
+      for (String dir in analysisRoots) {
+        await Package(dir).installDependencies(force: forcePackageInstall);
+      }
     }
 
     // Analyze.

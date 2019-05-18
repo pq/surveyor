@@ -75,14 +75,23 @@ class CommandLineOptions {
   /// Force installation of package dependencies.
   final bool forceInstall;
 
-  CommandLineOptions(
-      {this.verbose = false, this.color = false, this.forceInstall = false});
+  /// Skip package dependency install checks.
+  final bool skipInstall;
+
+  CommandLineOptions({
+    this.verbose = false,
+    this.color = false,
+    this.forceInstall = false,
+    this.skipInstall = false,
+  });
 
   CommandLineOptions.fromArgs(ArgResults args)
       : this(
-            verbose: args['verbose'],
-            color: args['color'],
-            forceInstall: args['force-install']);
+          verbose: args['verbose'],
+          color: args['color'],
+          forceInstall: args['force-install'],
+          skipInstall: args['skip-install'],
+        );
 }
 
 class PubspecFile {
