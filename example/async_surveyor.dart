@@ -25,6 +25,7 @@ main(List<String> args) async {
   }
 
   final driver = Driver.forArgs(args);
+  driver.forceSkipInstall = true;
   driver.visitor = AsyncCollector();
 
   await driver.analyze();
