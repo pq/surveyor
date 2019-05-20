@@ -17,24 +17,20 @@ From there you can run the `examples`.
 
 will analyze the project at the given path and present a list of found `Widget` child-parent 2-Grams.
 
-A sample run produces:
+A sample run produces a csv file with contents like this:
 
 ```
-2 Grams:
-Column->Container : 1
-Column->null : 1
-Container->Row : 1
-Expanded->Column : 1
-FlareActor->Container : 1
-FlareActor->GestureDetector : 1
-FlareActor->Scaffold : 1
-GestureDetector->Expanded : 1
-HomePage->null : 1
-MaterialApp->null : 1
-PageView->Scaffold : 1
-Row->GestureDetector : 1
-Scaffold->Column : 1
-Text->Column : 5
+AppBar -> Text, 1
+Center -> Column, 1
+Column -> Text, 3
+FloatingActionButton -> Icon, 1
+MaterialApp -> MyHomePage, 1
+Scaffold -> AppBar, 1
+Scaffold -> Center, 1
+Scaffold -> FloatingActionButton, 1
+null -> MaterialApp, 1
+null -> MyApp, 1
+null -> Scaffold, 1
 ```
 
 (Note that by default package dependencies will only be installed if a `.packages` file is absent from the project under analysis.  If you want to make sure package dependencies are (re)installed, run with the `--force-install` option.)
