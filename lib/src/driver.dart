@@ -125,6 +125,11 @@ class Driver {
                 await context.currentSession.getResolvedUnit(filePath);
 
             if (visitor != null) {
+              if (visitor is AstContext) {
+                AstContext astContext = visitor as AstContext;
+                astContext.setLineInfo(result.lineInfo);
+                astContext.setFilePath(filePath);
+              }
               result.unit.accept(visitor);
             }
           }

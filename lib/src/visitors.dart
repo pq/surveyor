@@ -1,8 +1,14 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
+import 'package:analyzer/source/line_info.dart';
 
 import 'common.dart';
+
+abstract class AstContext {
+  void setFilePath(String filePath);
+  void setLineInfo(LineInfo lineInfo);
+}
 
 /// A simple visitor for analysis options files.
 abstract class AnalysisOptionsVisitor {
