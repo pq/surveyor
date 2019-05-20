@@ -31,6 +31,8 @@ class Driver {
 
   bool showErrors = true;
 
+  bool resolveUnits = true;
+
   final List<String> sources;
 
   Driver(ArgResults argResults)
@@ -121,8 +123,9 @@ class Driver {
             }
 
             // todo (pq): move this up and collect errors from the resolved result.
-            ResolvedUnitResult result =
-                await context.currentSession.getResolvedUnit(filePath);
+            final result = resolveUnits
+                ? await context.currentSession.getResolvedUnit(filePath)
+                : await context.currentSession.getParsedUnit(filePath);
 
             if (visitor != null) {
               if (visitor is AstContext) {
@@ -130,7 +133,11 @@ class Driver {
                 astContext.setLineInfo(result.lineInfo);
                 astContext.setFilePath(filePath);
               }
-              result.unit.accept(visitor);
+              if (result is ParsedUnitResult) {
+                result.unit.accept(visitor);
+              } else if (result is ResolvedUnitResult) {
+                result.unit.accept(visitor);
+              }
             }
           }
 
@@ -146,6 +153,8 @@ class Driver {
             }
           }
         }
+
+        await pumpEventQueue(times: 512);
 
         postAnalyze(context);
       }

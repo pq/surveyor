@@ -28,6 +28,8 @@ main(List<String> args) async {
 
   final driver = Driver.forArgs(args);
   driver.forceSkipInstall = true;
+  driver.showErrors = false;
+  driver.resolveUnits = false;
   driver.visitor = AsyncCollector();
 
   await driver.analyze();
