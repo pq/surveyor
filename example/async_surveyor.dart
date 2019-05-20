@@ -21,6 +21,8 @@ main(List<String> args) async {
     if (!File('$dir/pubspec.yaml').existsSync()) {
       print("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList();
+      dirCount = args.length;
+      print('(Found $dirCount subdirectories.)');
     }
   }
 
@@ -31,8 +33,11 @@ main(List<String> args) async {
   await driver.analyze();
 }
 
+int dirCount;
+
 class AsyncCollector extends RecursiveAstVisitor
     implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
+  int count = 0;
   AsyncCollector();
 
   @override
@@ -43,7 +48,7 @@ class AsyncCollector extends RecursiveAstVisitor
   @override
   void preAnalysis(AnalysisContext context) {
     String dirName = path.basename(context.contextRoot.root.path);
-    print("Analyzing '$dirName'...");
+    print("Analyzing '$dirName'... • [${++count}/$dirCount]");
   }
 
   @override
