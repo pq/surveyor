@@ -107,3 +107,20 @@ class PubspecFile {
   /// Can throw a [FormatException] if yaml is malformed.
   YamlMap get yaml => _yaml ??= _readYamlFromString(contents);
 }
+
+/// Returns a [Future] that completes after the [event loop][] has run the given
+/// number of [times] (20 by default).
+///
+/// [event loop]: https://webdev.dartlang.org/articles/performance/event-loop#darts-event-loop-and-queues
+///
+/// Awaiting this approximates waiting until all asynchronous work (other than
+/// work that's waiting for external resources) completes.
+Future pumpEventQueue({int times}) {
+  times ??= 20;
+  if (times == 0) return Future.value();
+  // Use [new Future] future to allow microtask events to finish. The [new
+  // Future.value] constructor uses scheduleMicrotask itself and would therefore
+  // not wait for microtask callbacks that are scheduled after invoking this
+  // method.
+  return Future(() => pumpEventQueue(times: times - 1));
+}
