@@ -96,50 +96,54 @@ class Driver {
       for (String dir in analysisRoots) {
         await Package(dir).installDependencies(force: forcePackageInstall);
       }
+    } else {
+      print('(Skipped dependency checks.)');
     }
 
     // Analyze.
     print('Analyzing...');
 
-    List<ErrorsResult> results = <ErrorsResult>[];
-    AnalysisContextCollection collection = new AnalysisContextCollection(
-        includedPaths: analysisRoots, resourceProvider: resourceProvider);
-    for (AnalysisContext context in collection.contexts) {
-      preAnalyze(context);
+    final results = <ErrorsResult>[];
+    for (var root in analysisRoots) {
+      AnalysisContextCollection collection = new AnalysisContextCollection(
+          includedPaths: [root], resourceProvider: resourceProvider);
+      for (AnalysisContext context in collection.contexts) {
+        preAnalyze(context);
 
-      for (String filePath in context.contextRoot.analyzedFiles()) {
-        if (AnalysisEngine.isDartFileName(filePath)) {
-          if (showErrors) {
-            ErrorsResult result =
-                await context.currentSession.getErrors(filePath);
-            if (result.errors.isNotEmpty) {
-              results.add(result);
+        for (String filePath in context.contextRoot.analyzedFiles()) {
+          if (AnalysisEngine.isDartFileName(filePath)) {
+            if (showErrors) {
+              ErrorsResult result =
+                  await context.currentSession.getErrors(filePath);
+              if (result.errors.isNotEmpty) {
+                results.add(result);
+              }
+            }
+
+            // todo (pq): move this up and collect errors from the resolved result.
+            ResolvedUnitResult result =
+                await context.currentSession.getResolvedUnit(filePath);
+
+            if (visitor != null) {
+              result.unit.accept(visitor);
             }
           }
 
-          // todo (pq): move this up and collect errors from the resolved result.
-          ResolvedUnitResult result =
-              await context.currentSession.getResolvedUnit(filePath);
+          if (optionsVisitor != null) {
+            if (AnalysisEngine.isAnalysisOptionsFileName(filePath)) {
+              optionsVisitor.visit(AnalysisOptionsFile(filePath));
+            }
+          }
 
-          if (visitor != null) {
-            result.unit.accept(visitor);
+          if (pubspecVisitor != null) {
+            if (path.basename(filePath) == 'pubspec.yaml') {
+              pubspecVisitor.visit(PubspecFile(filePath));
+            }
           }
         }
 
-        if (optionsVisitor != null) {
-          if (AnalysisEngine.isAnalysisOptionsFileName(filePath)) {
-            optionsVisitor.visit(AnalysisOptionsFile(filePath));
-          }
-        }
-
-        if (pubspecVisitor != null) {
-          if (path.basename(filePath) == 'pubspec.yaml') {
-            pubspecVisitor.visit(PubspecFile(filePath));
-          }
-        }
+        postAnalyze(context);
       }
-
-      postAnalyze(context);
     }
 
     if (visitor is PostVisitCallback) {
