@@ -123,21 +123,25 @@ class Driver {
             }
 
             // todo (pq): move this up and collect errors from the resolved result.
-            final result = resolveUnits
-                ? await context.currentSession.getResolvedUnit(filePath)
-                : await context.currentSession.getParsedUnit(filePath);
-
-            if (visitor != null) {
-              if (visitor is AstContext) {
-                AstContext astContext = visitor as AstContext;
-                astContext.setLineInfo(result.lineInfo);
-                astContext.setFilePath(filePath);
+            try {
+              final result = resolveUnits
+                  ? await context.currentSession.getResolvedUnit(filePath)
+                  : await context.currentSession.getParsedUnit(filePath);
+              if (visitor != null) {
+                if (visitor is AstContext) {
+                  AstContext astContext = visitor as AstContext;
+                  astContext.setLineInfo(result.lineInfo);
+                  astContext.setFilePath(filePath);
+                }
+                if (result is ParsedUnitResult) {
+                  result.unit.accept(visitor);
+                } else if (result is ResolvedUnitResult) {
+                  result.unit.accept(visitor);
+                }
               }
-              if (result is ParsedUnitResult) {
-                result.unit.accept(visitor);
-              } else if (result is ResolvedUnitResult) {
-                result.unit.accept(visitor);
-              }
+            } catch (e) {
+              print('Exception caught analyzling: $filePath');
+              print(e.toString());
             }
           }
 
