@@ -36,30 +36,35 @@ main(List<String> args) async {
 int dirCount;
 
 class AsyncCollector extends RecursiveAstVisitor
-    implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
+    implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback, AstContext {
   int count = 0;
+  String filePath;
+  LineInfo lineInfo;
+
+  List<String> reports = <String>[];
+
   AsyncCollector();
 
   @override
   void onVisitFinished() {
-    // Reporting done in visitSimpleIdentifier.
+    print("Found ${reports.length} 'async's:");
+    reports.forEach(print);
   }
 
   @override
   void preAnalysis(AnalysisContext context) {
     String dirName = path.basename(context.contextRoot.root.path);
-    print("Analyzing '$dirName'... • [${++count}/$dirCount]");
+    print("Analyzing '$dirName' • [${++count}/$dirCount] ...");
   }
 
   @override
   visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.name == 'async') {
-      final cu =
-          node.staticElement.getAncestor((e) => e is CompilationUnitElement);
-      final lineInfo = LineInfo.fromContent(cu.source.contents.data);
       final location = lineInfo.getLocation(node.offset);
+      final report = '$filePath:${location.lineNumber}:${location.columnNumber}';
+      reports.add(report);
       print(
-          "found 'async' • ${cu.source.fullName}:${location.lineNumber}:${location.columnNumber}");
+          "found 'async' • $report");
     }
     return super.visitSimpleIdentifier(node);
   }
@@ -67,5 +72,15 @@ class AsyncCollector extends RecursiveAstVisitor
   @override
   void postAnalysis(AnalysisContext context) {
     // Reporting done in visitSimpleIdentifier.
+  }
+
+  @override
+  void setLineInfo(LineInfo lineInfo) {
+    this.lineInfo = lineInfo;
+  }
+
+  @override
+  void setFilePath(String filePath) {
+    this.filePath = filePath;
   }
 }
