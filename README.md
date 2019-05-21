@@ -42,6 +42,10 @@ null -> Scaffold, 1
 
 will analyze projects at the given path and identify places where `"async"` is used as a simple identifer.  These places would produce errors if `async` become a reserved keyword.
 
+Note that this generates a lot of output.  To make sure none of it is lost, consider redirecting to a file.  For example:
+
+    dart example/async_surveyor.dart  <path>  2>&1 | tee survey_out.txt
+
 
 ## Features and bugs
 
