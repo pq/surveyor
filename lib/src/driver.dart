@@ -60,9 +60,9 @@ class Driver {
   Future analyze({bool forceInstall}) => _analyze(sources);
 
   /// Hook to influence context before analysis.
-  void preAnalyze(AnalysisContext context) {
+  void preAnalyze(AnalysisContext context, {bool subDir}) {
     if (visitor is PreAnalysisCallback) {
-      (visitor as PreAnalysisCallback).preAnalysis(context);
+      (visitor as PreAnalysisCallback).preAnalysis(context, subDir: subDir);
     }
   }
 
@@ -110,7 +110,8 @@ class Driver {
       AnalysisContextCollection collection = new AnalysisContextCollection(
           includedPaths: [root], resourceProvider: resourceProvider);
       for (AnalysisContext context in collection.contexts) {
-        preAnalyze(context);
+        
+        preAnalyze(context, subDir: context.contextRoot.root.path != root);
 
         for (String filePath in context.contextRoot.analyzedFiles()) {
           if (AnalysisEngine.isDartFileName(filePath)) {

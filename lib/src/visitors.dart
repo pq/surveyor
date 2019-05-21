@@ -32,7 +32,7 @@ abstract class PostVisitCallback {
 }
 
 abstract class PreAnalysisCallback {
-  void preAnalysis(AnalysisContext context);
+  void preAnalysis(AnalysisContext context, {bool subDir});
 }
 
 abstract class PostAnalysisCallback {

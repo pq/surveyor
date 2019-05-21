@@ -57,7 +57,10 @@ class AsyncCollector extends RecursiveAstVisitor
   }
 
   @override
-  void preAnalysis(AnalysisContext context) {
+  void preAnalysis(AnalysisContext context, {bool subDir}) {
+    if (subDir) {
+      ++dirCount;
+    }
     currentFolder = context.contextRoot.root;
     String dirName = path.basename(context.contextRoot.root.path);
     print("Analyzing '$dirName' • [${++count}/$dirCount] ...");

@@ -108,7 +108,7 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
   @override
-  void preAnalysis(AnalysisContext context) {
+  void preAnalysis(AnalysisContext context, {bool subDir}) {
     dirName = path.basename(context.contextRoot.root.path);
     print("Analyzing '$dirName'...");
   }
