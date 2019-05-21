@@ -36,6 +36,13 @@ null -> Scaffold, 1
 (Note that by default package dependencies will only be installed if a `.packages` file is absent from the project under analysis.  If you want to make sure package dependencies are (re)installed, run with the `--force-install` option.)
 
 
+### Surveying `async` Identifier Use
+
+    dart bin/example/survey_async.dart <path_to_project>
+
+will analyze projects at the given path and identify places where `"async"` is used as a simple identifer.  These places would produce errors if `async` become a reserved keyword.
+
+
 ## Features and bugs
 
 This is very much a work in progress.  Please file feature requests, bugs and any feedback in the [issue tracker][tracker].
