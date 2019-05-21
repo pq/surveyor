@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/file_system/file_system.dart' hide File;
 import 'package:analyzer/source/line_info.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/driver.dart';
@@ -40,8 +40,11 @@ int dirCount;
 class AsyncCollector extends RecursiveAstVisitor
     implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback, AstContext {
   int count = 0;
+  int contexts = 0;
   String filePath;
+  Folder currentFolder;
   LineInfo lineInfo;
+  Set<Folder> contextRoots = <Folder>{};
 
   List<String> reports = <String>[];
 
@@ -49,12 +52,13 @@ class AsyncCollector extends RecursiveAstVisitor
 
   @override
   void onVisitFinished() {
-    print("Found ${reports.length} 'async's:");
+    print("Found ${reports.length} 'async's in ${contextRoots.length}:");
     reports.forEach(print);
   }
 
   @override
   void preAnalysis(AnalysisContext context) {
+    currentFolder = context.contextRoot.root;
     String dirName = path.basename(context.contextRoot.root.path);
     print("Analyzing '$dirName' • [${++count}/$dirCount] ...");
   }
@@ -67,6 +71,7 @@ class AsyncCollector extends RecursiveAstVisitor
       reports.add(report);
       print(
           "found 'async' • $report");
+      contextRoots.add(currentFolder);
     }
     return super.visitSimpleIdentifier(node);
   }
