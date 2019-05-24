@@ -20,10 +20,14 @@ main(List<String> args) async {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       print("Recursing into '$dir'...");
-      args = Directory(dir).listSync().map((f) => f.path).toList();
+      args = Directory(dir).listSync().map((f) => f.path).toList()..sort();
       dirCount = args.length;
       print('(Found $dirCount subdirectories.)');
     }
+  }
+
+  if (_debuglimit != null) {
+    print('Limiting analysis to $_debuglimit packages.');
   }
 
   final driver = Driver.forArgs(args);
@@ -37,8 +41,24 @@ main(List<String> args) async {
 
 int dirCount;
 
+/// If non-zero, stops once limit is reached (for debugging).
+int _debuglimit; //500;
+
+class Occurences {
+  int decls = 0;
+  int notDecls = 0;
+  Set<String> packages = <String>{};
+
+  @override
+  String toString() => '[$decls, $notDecls] : $packages';
+}
+
 class AsyncCollector extends RecursiveAstVisitor
-    implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback, AstContext {
+    implements
+        PostVisitCallback,
+        PreAnalysisCallback,
+        PostAnalysisCallback,
+        AstContext {
   int count = 0;
   int contexts = 0;
   String filePath;
@@ -46,41 +66,73 @@ class AsyncCollector extends RecursiveAstVisitor
   LineInfo lineInfo;
   Set<Folder> contextRoots = <Folder>{};
 
+  // id: inDecl, notInDecl
+  Map<String, Occurences> occurrences = <String, Occurences>{
+    'async': Occurences(),
+    'await': Occurences(),
+    'yield': Occurences(),
+  };
+
   List<String> reports = <String>[];
 
   AsyncCollector();
 
   @override
   void onVisitFinished() {
-    print("Found ${reports.length} 'async's in ${contextRoots.length}:");
+    print(
+        "Found ${reports.length} occurrences in ${contextRoots.length} packages:");
     reports.forEach(print);
+
+    for (var o in occurrences.entries) {
+      final data = o.value;
+      print('${o.key}: [${data.decls} decl, ${data.notDecls} ref]');
+      data.packages.forEach(print);
+    }
   }
 
   @override
-  void preAnalysis(AnalysisContext context, {bool subDir}) {
+  void preAnalysis(AnalysisContext context,
+      {bool subDir, DriverCommands commandCallback}) {
     if (subDir) {
       ++dirCount;
     }
     currentFolder = context.contextRoot.root;
     String dirName = path.basename(context.contextRoot.root.path);
-    print("Analyzing '$dirName' • [${++count}/$dirCount] ...");
+
+    print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
 
   @override
   visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.name == 'async') {
+    final id = node.name;
+
+    if (occurrences.containsKey(id)) {
+      var occurrence = occurrences[id];
+      if (node.inDeclarationContext()) {
+        occurrence.decls++;
+      } else {
+        occurrence.notDecls++;
+      }
+
+      // cache/flutter_util-0.0.1 => flutter_util
+      occurrence.packages
+          .add(currentFolder.path.split('/').last.split('-').first);
+
       final location = lineInfo.getLocation(node.offset);
-      final report = '$filePath:${location.lineNumber}:${location.columnNumber}';
+      final report =
+          '$filePath:${location.lineNumber}:${location.columnNumber}';
       reports.add(report);
-      print(
-          "found 'async' • $report");
+      final declDetail = node.inDeclarationContext() ? '(decl) ' : '';
+      print("found '$id' $declDetail• $report");
       contextRoots.add(currentFolder);
+      print(occurrences);
     }
     return super.visitSimpleIdentifier(node);
   }
 
   @override
-  void postAnalysis(AnalysisContext context) {
+  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
+    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
