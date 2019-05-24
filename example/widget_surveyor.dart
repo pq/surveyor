@@ -108,13 +108,13 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
   @override
-  void preAnalysis(AnalysisContext context, {bool subDir}) {
+  void preAnalysis(AnalysisContext context, {bool subDir, DriverCommands commandCallback}) {
     dirName = path.basename(context.contextRoot.root.path);
     print("Analyzing '$dirName'...");
   }
 
   @override
-  void postAnalysis(AnalysisContext context) {
+  void postAnalysis(AnalysisContext context, DriverCommands cmds) {
     write2Grams();
     writeWidgetCounts();
   }
