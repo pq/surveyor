@@ -67,9 +67,9 @@ class Driver {
   }
 
   /// Hook to influence context before analysis.
-  void postAnalyze(AnalysisContext context) {
+  void postAnalyze(AnalysisContext context, DriverCommands callback) {
     if (visitor is PostAnalysisCallback) {
-      (visitor as PostAnalysisCallback).postAnalysis(context);
+      (visitor as PostAnalysisCallback).postAnalysis(context, callback);
     }
   }
 
@@ -105,63 +105,66 @@ class Driver {
     // Analyze.
     print('Analyzing...');
 
+    final cmd = DriverCommands();
     final results = <ErrorsResult>[];
+
     for (var root in analysisRoots) {
-      AnalysisContextCollection collection = new AnalysisContextCollection(
-          includedPaths: [root], resourceProvider: resourceProvider);
-      for (AnalysisContext context in collection.contexts) {
-        
-        preAnalyze(context, subDir: context.contextRoot.root.path != root);
+      if (cmd.continueAnalyzing) {
+        AnalysisContextCollection collection = new AnalysisContextCollection(
+            includedPaths: [root], resourceProvider: resourceProvider);
 
-        for (String filePath in context.contextRoot.analyzedFiles()) {
-          if (AnalysisEngine.isDartFileName(filePath)) {
-            if (showErrors) {
-              ErrorsResult result =
-                  await context.currentSession.getErrors(filePath);
-              if (result.errors.isNotEmpty) {
-                results.add(result);
+        for (AnalysisContext context in collection.contexts) {
+          preAnalyze(context, subDir: context.contextRoot.root.path != root);
+
+          for (String filePath in context.contextRoot.analyzedFiles()) {
+            if (AnalysisEngine.isDartFileName(filePath)) {
+              if (showErrors) {
+                ErrorsResult result =
+                    await context.currentSession.getErrors(filePath);
+                if (result.errors.isNotEmpty) {
+                  results.add(result);
+                }
+              }
+
+              // todo (pq): move this up and collect errors from the resolved result.
+              try {
+                final result = resolveUnits
+                    ? await context.currentSession.getResolvedUnit(filePath)
+                    : await context.currentSession.getParsedUnit(filePath);
+                if (visitor != null) {
+                  if (visitor is AstContext) {
+                    AstContext astContext = visitor as AstContext;
+                    astContext.setLineInfo(result.lineInfo);
+                    astContext.setFilePath(filePath);
+                  }
+                  if (result is ParsedUnitResult) {
+                    result.unit.accept(visitor);
+                  } else if (result is ResolvedUnitResult) {
+                    result.unit.accept(visitor);
+                  }
+                }
+              } catch (e) {
+                print('Exception caught analyzing: $filePath');
+                print(e.toString());
               }
             }
 
-            // todo (pq): move this up and collect errors from the resolved result.
-            try {
-              final result = resolveUnits
-                  ? await context.currentSession.getResolvedUnit(filePath)
-                  : await context.currentSession.getParsedUnit(filePath);
-              if (visitor != null) {
-                if (visitor is AstContext) {
-                  AstContext astContext = visitor as AstContext;
-                  astContext.setLineInfo(result.lineInfo);
-                  astContext.setFilePath(filePath);
-                }
-                if (result is ParsedUnitResult) {
-                  result.unit.accept(visitor);
-                } else if (result is ResolvedUnitResult) {
-                  result.unit.accept(visitor);
-                }
+            if (optionsVisitor != null) {
+              if (AnalysisEngine.isAnalysisOptionsFileName(filePath)) {
+                optionsVisitor.visit(AnalysisOptionsFile(filePath));
               }
-            } catch (e) {
-              print('Exception caught analyzling: $filePath');
-              print(e.toString());
+            }
+
+            if (pubspecVisitor != null) {
+              if (path.basename(filePath) == 'pubspec.yaml') {
+                pubspecVisitor.visit(PubspecFile(filePath));
+              }
             }
           }
 
-          if (optionsVisitor != null) {
-            if (AnalysisEngine.isAnalysisOptionsFileName(filePath)) {
-              optionsVisitor.visit(AnalysisOptionsFile(filePath));
-            }
-          }
-
-          if (pubspecVisitor != null) {
-            if (path.basename(filePath) == 'pubspec.yaml') {
-              pubspecVisitor.visit(PubspecFile(filePath));
-            }
-          }
+          await pumpEventQueue(times: 512);
+          postAnalyze(context, cmd);
         }
-
-        await pumpEventQueue(times: 512);
-
-        postAnalyze(context);
       }
     }
 
@@ -187,4 +190,8 @@ class Driver {
     formatter.flush();
     stats.print();
   }
+}
+
+class DriverCommands {
+  bool continueAnalyzing = true;
 }
