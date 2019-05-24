@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:surveyor/src/driver.dart';
 
 import 'common.dart';
 
@@ -32,11 +33,11 @@ abstract class PostVisitCallback {
 }
 
 abstract class PreAnalysisCallback {
-  void preAnalysis(AnalysisContext context, {bool subDir});
+  void preAnalysis(AnalysisContext context, {bool subDir, DriverCommands commandCallback});
 }
 
 abstract class PostAnalysisCallback {
-  void postAnalysis(AnalysisContext context);
+  void postAnalysis(AnalysisContext context, DriverCommands commandCallback);
 }
 
 /// A simple visitor for pubspec files.
