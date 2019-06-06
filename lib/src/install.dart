@@ -18,11 +18,15 @@ class Package {
     return {};
   }
 
+  File get pubspecFile => File('${dir.path}/pubspec.yaml');
+
+  File get packagesFile => File('${dir.path}/.packages');
+
   Map<dynamic, yaml.YamlNode> get pubspec {
-    final pubspecFile = File('${dir.path}/pubspec.yaml');
-    if (pubspecFile.existsSync()) {
+    final file = pubspecFile;
+    if (file.existsSync()) {
       try {
-        return (yaml.loadYaml(pubspecFile.readAsStringSync()) as yaml.YamlMap)
+        return (yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap)
             .nodes;
       } on yaml.YamlException {
         // Warn?
@@ -42,16 +46,16 @@ class Package {
 }
 
 class _Installer {
-  bool hasDependenciesInstalled(Package package) {
-    var sourceDir = package.dir;
-    return sourceDir.existsSync() &&
-        File('${sourceDir.path}/.packages').existsSync();
-  }
+  bool hasDependenciesInstalled(Package package) => package.dir.existsSync() &&
+       package.packagesFile.existsSync();
 
   Future<ProcessResult> installDependencies(Package package) async {
     final sourcePath = package.dir.path;
     if (!package.dir.existsSync()) {
       print('Unable to install dependencies: $sourcePath does not exist');
+      return null;
+    }
+    if (!package.pubspecFile.existsSync()) {
       return null;
     }
 

@@ -82,7 +82,7 @@ class Driver {
       return;
     }
     ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
-    List<ErrorsResult> results =
+    List<AnalysisResultWithErrors> results =
         await _analyzeFiles(resourceProvider, sourceDirs);
     print('Finished.');
     if (showErrors) {
@@ -90,23 +90,18 @@ class Driver {
     }
   }
 
-  Future<List<ErrorsResult>> _analyzeFiles(
+  Future<List<AnalysisResultWithErrors>> _analyzeFiles(
       ResourceProvider resourceProvider, List<String> analysisRoots) async {
-    // Ensure dependencies are installed.
-    if (!skipPackageInstall) {
-      print('Checking dependencies...');
-      for (String dir in analysisRoots) {
-        await Package(dir).installDependencies(force: forcePackageInstall);
-      }
-    } else {
-      print('(Skipped dependency checks.)');
+
+    if (skipPackageInstall) {
+      print('(Skipping dependency checks.)');
     }
 
     // Analyze.
     print('Analyzing...');
 
     final cmd = DriverCommands();
-    final results = <ErrorsResult>[];
+    final results = <AnalysisResultWithErrors>[];
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
@@ -114,23 +109,35 @@ class Driver {
             includedPaths: [root], resourceProvider: resourceProvider);
 
         for (AnalysisContext context in collection.contexts) {
-          preAnalyze(context, subDir: context.contextRoot.root.path != root);
+          final dir = context.contextRoot.root.path;
+          final package = Package(dir);
+          // Ensure dependencies are installed.
+          if (!skipPackageInstall) {
+            await package.installDependencies(force: forcePackageInstall);
+          }
+
+          // Skip analysis if no .packages.
+          if (!package.packagesFile.existsSync()) {
+            print('No .packages in $dir (skipping analysis)');
+            continue;
+          }
+
+          preAnalyze(context, subDir: dir != root);
 
           for (String filePath in context.contextRoot.analyzedFiles()) {
             if (AnalysisEngine.isDartFileName(filePath)) {
-              if (showErrors) {
-                ErrorsResult result =
-                    await context.currentSession.getErrors(filePath);
-                if (result.errors.isNotEmpty) {
-                  results.add(result);
-                }
-              }
 
-              // todo (pq): move this up and collect errors from the resolved result.
               try {
                 final result = resolveUnits
                     ? await context.currentSession.getResolvedUnit(filePath)
                     : await context.currentSession.getParsedUnit(filePath);
+
+                if (showErrors) {
+                  if (result.errors.isNotEmpty) {
+                    results.add(result);
+                  }
+                }
+
                 if (visitor != null) {
                   if (visitor is AstContext) {
                     AstContext astContext = visitor as AstContext;
@@ -175,9 +182,9 @@ class Driver {
     return results;
   }
 
-  void _printAnalysisResults(List<ErrorsResult> results) {
+  void _printAnalysisResults(List<AnalysisResultWithErrors> results) {
     List<AnalysisErrorInfo> infos = <AnalysisErrorInfo>[];
-    for (ErrorsResult result in results) {
+    for (AnalysisResultWithErrors result in results) {
       final errors = result.errors.where(showError).toList();
       if (errors.isNotEmpty) {
         infos.add(new AnalysisErrorInfoImpl(errors, result.lineInfo));
