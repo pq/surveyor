@@ -3,7 +3,7 @@ Tools for surveying Dart packages
 
 ## Installing
 
-These tools are best run from source.  To get the sources, clone the `suveyor` repo like this:
+These tools are best run from source.  To get the sources, clone the `surveyor` repo like this:
 
     $ git clone https://github.com/pq/surveyor.git
 
