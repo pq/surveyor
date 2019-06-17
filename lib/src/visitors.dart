@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:surveyor/src/driver.dart';
 
@@ -21,6 +22,11 @@ class OptionsVisitor extends AnalysisOptionsVisitor {
   void visit(AnalysisOptionsFile options) {
     //print('>> visiting: ${options.file}');
   }
+}
+
+/// Hook for custom error filtering.
+abstract class ErrorFilter {
+  bool showError(AnalysisError element);
 }
 
 /// A simple visitor for package roots.

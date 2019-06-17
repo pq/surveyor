@@ -74,7 +74,12 @@ class Driver {
   }
 
   /// Hook for custom error filtering.
-  bool showError(AnalysisError element) => true;
+  bool showError(AnalysisError element) {
+    if (visitor is ErrorFilter) {
+      return (visitor as ErrorFilter).showError(element);
+    }
+    return true;
+  }
 
   Future _analyze(List<String> sourceDirs, {bool forceInstall}) async {
     if (sourceDirs.isEmpty) {
