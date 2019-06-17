@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
 
@@ -13,6 +14,8 @@ import 'package:path/path.dart' as path;
 ///
 /// dart example/error_surveyor.dart <source dir>
 main(List<String> args) async {
+  final stopwatch = Stopwatch()..start();
+
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
@@ -39,12 +42,15 @@ main(List<String> args) async {
   driver.showErrors = true;
 
   await driver.analyze();
+
+  print(
+      '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
 }
 
 int dirCount;
 
 class AnalysisAdvisor extends SimpleAstVisitor
-    implements PreAnalysisCallback, PostAnalysisCallback {
+    implements PreAnalysisCallback, PostAnalysisCallback, ErrorFilter {
   int count = 0;
 
   @override
@@ -66,8 +72,21 @@ class AnalysisAdvisor extends SimpleAstVisitor
     }
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
+
+  @override
+  bool showError(AnalysisError error) {
+    final errorType = error.errorCode.type;
+    if (errorType == ErrorType.HINT ||
+        errorType == ErrorType.LINT ||
+        errorType == ErrorType.TODO) {
+      return false;
+    }
+    // todo (pq): filter on specific error type
+    //print('${error.errorCode.type} :  ${error.errorCode.name}');
+    return true;
+  }
 }
 
 //
 /// If non-null, stops once limit is reached (for debugging).
-int _debuglimit = 100;
+int _debuglimit; // = 30;
