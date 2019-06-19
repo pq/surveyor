@@ -4,16 +4,13 @@ import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/generated/engine.dart'
-    show AnalysisEngine, AnalysisErrorInfo, AnalysisErrorInfoImpl;
+import 'package:analyzer/src/generated/engine.dart' show AnalysisEngine;
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/install.dart';
 
-import 'analysis.dart';
 import 'common.dart';
 import 'visitors.dart';
 
@@ -73,31 +70,18 @@ class Driver {
     }
   }
 
-  /// Hook for custom error filtering.
-  bool showError(AnalysisError element) {
-    if (visitor is ErrorFilter) {
-      return (visitor as ErrorFilter).showError(element);
-    }
-    return true;
-  }
-
   Future _analyze(List<String> sourceDirs, {bool forceInstall}) async {
     if (sourceDirs.isEmpty) {
       print('Specify one or more files and directories.');
       return;
     }
     ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
-    List<AnalysisResultWithErrors> results =
-        await _analyzeFiles(resourceProvider, sourceDirs);
+    await _analyzeFiles(resourceProvider, sourceDirs);
     print('Finished.');
-    if (showErrors) {
-      _printAnalysisResults(results);
-    }
   }
 
-  Future<List<AnalysisResultWithErrors>> _analyzeFiles(
+  Future _analyzeFiles(
       ResourceProvider resourceProvider, List<String> analysisRoots) async {
-
     if (skipPackageInstall) {
       print('(Skipping dependency checks.)');
     }
@@ -106,7 +90,6 @@ class Driver {
     print('Analyzing...');
 
     final cmd = DriverCommands();
-    final results = <AnalysisResultWithErrors>[];
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
@@ -131,19 +114,15 @@ class Driver {
 
           for (String filePath in context.contextRoot.analyzedFiles()) {
             if (AnalysisEngine.isDartFileName(filePath)) {
-
               try {
                 final result = resolveUnits
                     ? await context.currentSession.getResolvedUnit(filePath)
                     : await context.currentSession.getParsedUnit(filePath);
 
-                if (showErrors) {
-                  if (result.errors.isNotEmpty) {
-                    results.add(result);
-                  }
-                }
-
                 if (visitor != null) {
+                  if (visitor is ErrorReporter) {
+                    (visitor as ErrorReporter).reportError(result);
+                  }
                   if (visitor is AstContext) {
                     AstContext astContext = visitor as AstContext;
                     astContext.setLineInfo(result.lineInfo);
@@ -183,24 +162,6 @@ class Driver {
     if (visitor is PostVisitCallback) {
       (visitor as PostVisitCallback).onVisitFinished();
     }
-
-    return results;
-  }
-
-  void _printAnalysisResults(List<AnalysisResultWithErrors> results) {
-    List<AnalysisErrorInfo> infos = <AnalysisErrorInfo>[];
-    for (AnalysisResultWithErrors result in results) {
-      final errors = result.errors.where(showError).toList();
-      if (errors.isNotEmpty) {
-        infos.add(new AnalysisErrorInfoImpl(errors, result.lineInfo));
-      }
-    }
-    AnalysisStats stats = new AnalysisStats();
-    HumanErrorFormatter formatter =
-        new HumanErrorFormatter(io.stdout, options, stats);
-    formatter.formatErrors(infos);
-    formatter.flush();
-    stats.print();
   }
 }
 
