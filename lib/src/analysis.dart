@@ -8,8 +8,6 @@ import 'package:analyzer/src/generated/engine.dart';
 import 'package:analyzer/src/generated/source.dart';
 import 'package:path/path.dart' as path;
 
-import 'common.dart';
-
 final Map<String, int> _severityCompare = {
   'error': 5,
   'warning': 4,
@@ -200,12 +198,10 @@ class CLIError implements Comparable<CLIError> {
 /// format.
 abstract class ErrorFormatter {
   final StringSink out;
-  final CommandLineOptions options;
   final AnalysisStats stats;
   SeverityProcessor _severityProcessor;
 
-  ErrorFormatter(this.out, this.options, this.stats,
-      {SeverityProcessor severityProcessor}) {
+  ErrorFormatter(this.out, this.stats, {SeverityProcessor severityProcessor}) {
     _severityProcessor =
         severityProcessor == null ? _severityIdentity : severityProcessor;
   }
@@ -244,15 +240,18 @@ abstract class ErrorFormatter {
 
 class HumanErrorFormatter extends ErrorFormatter {
   AnsiLogger ansi;
+  bool displayCorrections;
 
   // This is a Set in order to de-dup CLI errors.
   final Set<CLIError> batchedErrors = new Set();
 
-  HumanErrorFormatter(
-      StringSink out, CommandLineOptions options, AnalysisStats stats,
-      {SeverityProcessor severityProcessor})
-      : super(out, options, stats, severityProcessor: severityProcessor) {
-    ansi = new AnsiLogger(this.options.color);
+  HumanErrorFormatter(StringSink out, AnalysisStats stats,
+      {SeverityProcessor severityProcessor,
+      bool ansiColor = false,
+      bool displayCorrections = false})
+      : super(out, stats, severityProcessor: severityProcessor) {
+    ansi = new AnsiLogger(ansiColor);
+    this.displayCorrections = displayCorrections;
   }
 
   @override
@@ -281,8 +280,7 @@ class HumanErrorFormatter extends ErrorFormatter {
       out.write('${ansi.bullet} ${error.errorCode}');
       out.writeln();
 
-      // If verbose, also print any associated correction.
-      if (options.verbose && error.correction != null) {
+      if (displayCorrections && error.correction != null) {
         out.writeln(
             '${' '.padLeft(error.severity.length + 2)}${error.correction}');
       }
