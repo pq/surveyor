@@ -26,8 +26,7 @@ class Package {
     final file = pubspecFile;
     if (file.existsSync()) {
       try {
-        return (yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap)
-            .nodes;
+        return (yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap).nodes;
       } on yaml.YamlException {
         // Warn?
       }
@@ -46,8 +45,8 @@ class Package {
 }
 
 class _Installer {
-  bool hasDependenciesInstalled(Package package) => package.dir.existsSync() &&
-       package.packagesFile.existsSync();
+  bool hasDependenciesInstalled(Package package) =>
+      package.dir.existsSync() && package.packagesFile.existsSync();
 
   Future<ProcessResult> installDependencies(Package package) async {
     final sourcePath = package.dir.path;
@@ -65,7 +64,6 @@ class _Installer {
           workingDirectory: sourcePath);
     }
 
-    //TODO: recurse and run pub get in example dirs.
     print('Running "pub get" in ${path.basename(sourcePath)}');
     return Process.run('pub', ['get'], workingDirectory: sourcePath);
   }
