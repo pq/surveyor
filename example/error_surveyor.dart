@@ -1,17 +1,14 @@
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
-
-import 'package:analyzer/src/generated/engine.dart' show AnalysisErrorInfoImpl;
-
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
+import 'package:analyzer/src/generated/engine.dart' show AnalysisErrorInfoImpl;
+import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
-
-import 'package:path/path.dart' as path;
 
 /// Analyzes projects, filtering specifically for errors of a specified type.
 ///
@@ -119,6 +116,5 @@ class AnalysisAdvisor extends SimpleAstVisitor
   }
 }
 
-//
 /// If non-null, stops once limit is reached (for debugging).
 int _debuglimit; // = 300;
