@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 
-import 'package:analyzer/src/generated/engine.dart'
-    show AnalysisEngine, AnalysisErrorInfo, AnalysisErrorInfoImpl;
+import 'package:analyzer/src/generated/engine.dart' show AnalysisErrorInfoImpl;
 
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
