@@ -31,8 +31,8 @@ main(List<String> args) async {
 }
 
 class TwoGram implements Comparable<TwoGram> {
-  String parent;
-  String child;
+  final String parent;
+  final String child;
 
   TwoGram(DartType parent, DartType child)
       : parent = parent?.name ?? 'null',
@@ -54,7 +54,7 @@ class TwoGram implements Comparable<TwoGram> {
 }
 
 class TwoGrams {
-  Map<TwoGram, int> map = <TwoGram, int>{};
+  final Map<TwoGram, int> map = <TwoGram, int>{};
 
   void add(TwoGram twoGram) {
     map.update(twoGram, (v) => v + 1, ifAbsent: () => 1);
@@ -62,9 +62,10 @@ class TwoGrams {
 
   @override
   String toString() {
-    var sb = StringBuffer();
-    for (var entry in map.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key))) {
+    final sb = StringBuffer();
+    final entries = map.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    for (var entry in entries) {
       sb.writeln('${entry.key}, ${entry.value}');
     }
     return sb.toString();
@@ -72,25 +73,19 @@ class TwoGrams {
 }
 
 class WidgetCollector extends RecursiveAstVisitor
-    implements PostVisitCallback, PreAnalysisCallback, PostAnalysisCallback {
-  TwoGrams twoGrams = TwoGrams();
-  Map<String, int> widgets = <String, int>{};
-
-  ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
+    implements PreAnalysisCallback, PostAnalysisCallback {
+  final TwoGrams twoGrams = TwoGrams();
+  final Map<DartType, int> widgets = <DartType, int>{};
+  final ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
 
   String dirName;
   WidgetCollector();
 
   @override
-  void onVisitFinished() {
-    // todo (pq): write summary info.
-  }
-
-  @override
   visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
-      widgets.update(type.name, (v) => v + 1, ifAbsent: () => 1);
+      widgets.update(type, (v) => v + 1, ifAbsent: () => 1);
 
       DartType parent =
           enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
@@ -108,31 +103,35 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
   @override
-  void preAnalysis(AnalysisContext context, {bool subDir, DriverCommands commandCallback}) {
+  void preAnalysis(AnalysisContext context,
+      {bool subDir, DriverCommands commandCallback}) {
     dirName = path.basename(context.contextRoot.root.path);
     print("Analyzing '$dirName'...");
   }
 
   @override
-  void postAnalysis(AnalysisContext context, DriverCommands cmds) {
+  void postAnalysis(AnalysisContext context, DriverCommands _) {
     write2Grams();
     writeWidgetCounts();
   }
 
   void write2Grams() {
     final fileName = '${dirName}_2gram.csv';
-    print('Writing 2-Grams to "${path.basename(fileName)}"...');
+    print("Writing 2-Grams to '${path.basename(fileName)}'...");
     File(fileName).writeAsStringSync(twoGrams.toString());
   }
 
   void writeWidgetCounts() {
     final fileName = '${dirName}_widget.csv';
-    print('Writing Widget counts to "${path.basename(fileName)}"...');
+    print("Writing Widget counts to '${path.basename(fileName)}'...");
     final sb = StringBuffer();
-
-    widgets.entries.forEach((entry) {
-      sb.write('${entry.key}, ${entry.value}\n');
-    });
+    for (var entry in widgets.entries) {
+      final type = entry.key;
+      final isFlutterWidget = type.element.library.location.components[0]
+          .startsWith('package:flutter/');
+      final widgetType = isFlutterWidget ? 'flutter' : '*';
+      sb.write('$type, ${entry.value}, $widgetType\n');
+    }
     File(fileName).writeAsStringSync(sb.toString());
   }
 }
