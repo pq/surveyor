@@ -99,6 +99,8 @@ class WidgetCollector extends RecursiveAstVisitor
 
       // Reset parent.
       enclosingWidgets.removeFirst();
+    } else {
+      super.visitInstanceCreationExpression(node);
     }
   }
 
