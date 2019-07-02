@@ -13,7 +13,7 @@ From there you can run the `examples`.
 
 ### Surveying Widget Use
 
-    dart bin/example/survey_widgets.dart <path_to_project>
+    dart example/widget_surveyor.dart <path_to_project>
 
 will analyze the project at the given path and present a list of found `Widget` child-parent 2-Grams.
 
