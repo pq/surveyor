@@ -10,12 +10,10 @@ linter:
    rules:
      - annotate_overrides
      - camel_case_types
-     - empty_constructor_bodies
      - empty_statements
      - hash_and_equals
      - non_constant_identifier_names
      - prefer_expression_function_bodies
-     - slash_for_doc_comments
      - test_types_in_equals
      - throw_in_finally
      - type_init_formals
