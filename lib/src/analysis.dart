@@ -215,9 +215,9 @@ abstract class ErrorFormatter {
   void formatErrors(List<AnalysisErrorInfo> errorInfos) {
     stats.unfilteredCount += errorInfos.length;
 
-    List<AnalysisError> errors = new List<AnalysisError>();
+    List<AnalysisError> errors = List<AnalysisError>();
     Map<AnalysisError, LineInfo> errorToLine =
-        new Map<AnalysisError, LineInfo>();
+        Map<AnalysisError, LineInfo>();
     for (AnalysisErrorInfo errorInfo in errorInfos) {
       for (AnalysisError error in errorInfo.errors) {
         if (_computeSeverity(error) != null) {
@@ -243,14 +243,14 @@ class HumanErrorFormatter extends ErrorFormatter {
   bool displayCorrections;
 
   // This is a Set in order to de-dup CLI errors.
-  final Set<CLIError> batchedErrors = new Set();
+  final Set<CLIError> batchedErrors = Set();
 
   HumanErrorFormatter(StringSink out, AnalysisStats stats,
       {SeverityProcessor severityProcessor,
       bool ansiColor = false,
       bool displayCorrections = false})
       : super(out, stats, severityProcessor: severityProcessor) {
-    ansi = new AnsiLogger(ansiColor);
+    ansi = AnsiLogger(ansiColor);
     this.displayCorrections = displayCorrections;
   }
 
@@ -326,7 +326,7 @@ class HumanErrorFormatter extends ErrorFormatter {
       sourcePath = _relative(source.fullName);
     }
 
-    batchedErrors.add(new CLIError(
+    batchedErrors.add(CLIError(
       severity: errorType,
       sourcePath: sourcePath,
       offset: error.offset,
