@@ -6,7 +6,9 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/generated/engine.dart' show AnalysisEngine;
+import 'package:analyzer/src/generated/engine.dart' show AnalysisEngine, AnalysisOptionsImpl;
+import 'package:analyzer/src/lint/registry.dart';
+import 'package:analyzer/src/services/lint.dart';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/install.dart';
@@ -32,6 +34,10 @@ class Driver {
 
   final List<String> sources;
 
+  List<Linter> _lints;
+
+  bool forceSkipInstall = false;
+
   Driver(ArgResults argResults)
       : options = CommandLineOptions.fromArgs(argResults),
         sources = argResults.rest
@@ -48,25 +54,34 @@ class Driver {
     return Driver(argResults);
   }
 
-  bool forceSkipInstall = false;
-
   bool get forcePackageInstall => options.forceInstall;
+
+  List<Linter> get lints => _lints;
+
+  /// Hook to contribute custom lint rules.
+  set lints(List<Linter> lints) {
+    // Ensure lints are registered
+    for (var lint in lints) {
+      Registry.ruleRegistry.register(lint);
+    }
+    _lints = lints;
+  }
 
   bool get skipPackageInstall => forceSkipInstall || options.skipInstall;
 
   Future analyze({bool forceInstall}) => _analyze(sources);
 
-  /// Hook to influence context before analysis.
-  void preAnalyze(AnalysisContext context, {bool subDir}) {
-    if (visitor is PreAnalysisCallback) {
-      (visitor as PreAnalysisCallback).preAnalysis(context, subDir: subDir);
+  /// Hook to influence context post analysis.
+  void postAnalyze(AnalysisContext context, DriverCommands callback) {
+    if (visitor is PostAnalysisCallback) {
+      (visitor as PostAnalysisCallback).postAnalysis(context, callback);
     }
   }
 
   /// Hook to influence context before analysis.
-  void postAnalyze(AnalysisContext context, DriverCommands callback) {
-    if (visitor is PostAnalysisCallback) {
-      (visitor as PostAnalysisCallback).postAnalysis(context, callback);
+  void preAnalyze(AnalysisContext context, {bool subDir}) {
+    if (visitor is PreAnalysisCallback) {
+      (visitor as PreAnalysisCallback).preAnalysis(context, subDir: subDir);
     }
   }
 
@@ -93,10 +108,17 @@ class Driver {
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
-        AnalysisContextCollection collection = new AnalysisContextCollection(
+        AnalysisContextCollection collection = AnalysisContextCollection(
             includedPaths: [root], resourceProvider: resourceProvider);
 
         for (AnalysisContext context in collection.contexts) {
+          // Add custom lints.
+          if (lints != null) {
+            var definedRules = context.analysisOptions.lintRules;
+            var options = context.analysisOptions as AnalysisOptionsImpl;
+            options.lintRules = definedRules.toList()..addAll(lints);
+            options.lint = true;
+          }
           final dir = context.contextRoot.root.path;
           final package = Package(dir);
           // Ensure dependencies are installed.
