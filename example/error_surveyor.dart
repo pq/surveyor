@@ -63,7 +63,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
   HumanErrorFormatter formatter;
 
   AnalysisAdvisor() {
-    stats = new AnalysisStats();
+    stats = AnalysisStats();
     formatter = HumanErrorFormatter(stdout, stats);
   }
 
@@ -106,7 +106,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
       return;
     }
     formatter
-        .formatErrors([new AnalysisErrorInfoImpl(errors, result.lineInfo)]);
+        .formatErrors([AnalysisErrorInfoImpl(errors, result.lineInfo)]);
     formatter.flush();
   }
 
