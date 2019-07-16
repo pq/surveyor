@@ -16,7 +16,6 @@ linter:
      - prefer_expression_function_bodies
      - test_types_in_equals
      - throw_in_finally
-     - type_init_formals
      - unnecessary_brace_in_string_interps
      - unnecessary_lambdas
      - unnecessary_statements
