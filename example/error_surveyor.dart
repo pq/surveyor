@@ -42,6 +42,7 @@ main(List<String> args) async {
   final driver = Driver.forArgs(args);
   driver.visitor = AnalysisAdvisor();
   driver.showErrors = true;
+  driver.excludes = [''];
 
   await driver.analyze();
 

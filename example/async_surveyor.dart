@@ -80,7 +80,7 @@ class AsyncCollector extends RecursiveAstVisitor
   @override
   void onVisitFinished() {
     print(
-        "Found ${reports.length} occurrences in ${contextRoots.length} packages:");
+        'Found ${reports.length} occurrences in ${contextRoots.length} packages:');
     reports.forEach(print);
 
     for (var o in occurrences.entries) {
