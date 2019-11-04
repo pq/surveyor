@@ -138,7 +138,7 @@ class Driver {
           // Add custom lints.
           if (lints != null) {
             final options = context.analysisOptions as AnalysisOptionsImpl;
-            options.lintRules =  context.analysisOptions.lintRules.toList();
+            options.lintRules = context.analysisOptions.lintRules.toList();
             for (var lint in lints) {
               options.lintRules.add(lint);
             }
