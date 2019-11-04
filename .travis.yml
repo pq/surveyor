@@ -2,8 +2,10 @@ language: dart
 sudo: false
 dart:
   - dev
-
 script: ./tool/travis.sh
+env:
+  - SURVEYOR_BOT=main
+  - SURVEYOR_BOT=format
 
 branches:
   only:
