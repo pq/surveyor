@@ -4,7 +4,8 @@
 include: package:pedantic/analysis_options.yaml
 
 analyzer:
-  exclude: 'test/data/**'
+  exclude:
+    - test/data/**
 
 linter:
    rules:
@@ -14,6 +15,8 @@ linter:
      - hash_and_equals
      - non_constant_identifier_names
      - prefer_expression_function_bodies
+     - prefer_relative_imports
+     - prefer_single_quotes
      - test_types_in_equals
      - throw_in_finally
      - unnecessary_brace_in_string_interps
