@@ -1,6 +1,8 @@
 # 📐 surveyor
 Tools for surveying Dart packages
 
+[![Build Status](https://travis-ci.org/pq/surveyor.svg)](https://travis-ci.org/pq/surveyor)
+
 ## Installing
 
 These tools are best run from source.  To get the sources, clone the `surveyor` repo like this:
