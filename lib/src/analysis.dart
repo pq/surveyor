@@ -216,8 +216,7 @@ abstract class ErrorFormatter {
     stats.unfilteredCount += errorInfos.length;
 
     List<AnalysisError> errors = List<AnalysisError>();
-    Map<AnalysisError, LineInfo> errorToLine =
-        Map<AnalysisError, LineInfo>();
+    Map<AnalysisError, LineInfo> errorToLine = Map<AnalysisError, LineInfo>();
     for (AnalysisErrorInfo errorInfo in errorInfos) {
       for (AnalysisError error in errorInfo.errors) {
         if (_computeSeverity(error) != null) {
