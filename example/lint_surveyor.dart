@@ -7,6 +7,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/src/generated/engine.dart' show AnalysisErrorInfoImpl;
 import 'package:analyzer/src/lint/linter.dart';
+// import 'package:linter/src/rules/camel_case_types.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
@@ -45,7 +46,12 @@ main(List<String> args) async {
   driver.visitor = AnalysisAdvisor();
   driver.showErrors = true;
 
-  driver.lints = [CustomLint()];
+  driver.lints = [
+    // Add a custom rule.
+    CustomLint(),
+    // And/or specify ones defined in the linter.
+    // CamelCaseTypes(),
+  ];
 
   await driver.analyze();
 
