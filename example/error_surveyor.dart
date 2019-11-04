@@ -42,7 +42,9 @@ main(List<String> args) async {
   final driver = Driver.forArgs(args);
   driver.visitor = AnalysisAdvisor();
   driver.showErrors = true;
-  driver.excludes = [''];
+
+  // Uncomment to ignore test dirs.
+  //driver.excludedPaths = ['test'];
 
   await driver.analyze();
 
@@ -106,8 +108,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
     if (errors.isEmpty) {
       return;
     }
-    formatter
-        .formatErrors([AnalysisErrorInfoImpl(errors, result.lineInfo)]);
+    formatter.formatErrors([AnalysisErrorInfoImpl(errors, result.lineInfo)]);
     formatter.flush();
   }
 

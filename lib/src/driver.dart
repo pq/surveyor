@@ -6,7 +6,8 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/generated/engine.dart' show AnalysisEngine, AnalysisOptionsImpl;
+import 'package:analyzer/src/generated/engine.dart'
+    show AnalysisEngine, AnalysisOptionsImpl;
 import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer/src/services/lint.dart';
 import 'package:args/args.dart';
@@ -28,9 +29,20 @@ class Driver {
   /// Hook to contribute custom pubspec analysis.
   PubspecVisitor pubspecVisitor;
 
-  /// List of globs describing files to be excluded from analysis.
-  /// See: https://dart.dev/guides/language/analysis-options#excluding-files
-  List<String> excludes;
+  /// List of paths to exclude from analysis.
+  /// For example:
+  /// ```
+  ///   driver.excludedPaths = ['example', 'test'];
+  /// ```
+  /// excludes package `example` and `test` directories.
+  set excludedPaths(List<String> excludedPaths) {
+    _excludedPaths = excludedPaths;
+  }
+
+  List<String> _excludedPaths;
+
+  /// List of paths to exclude from analysis.
+  List<String> get excludedPaths => _excludedPaths ?? [];
 
   bool showErrors = true;
 
@@ -105,6 +117,10 @@ class Driver {
       print('(Skipping dependency checks.)');
     }
 
+    if (excludedPaths.isNotEmpty) {
+      print('(Excluding paths $excludedPaths from analysis.)');
+    }
+
     // Analyze.
     print('Analyzing...');
 
@@ -113,7 +129,10 @@ class Driver {
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
         AnalysisContextCollection collection = AnalysisContextCollection(
-            includedPaths: [root], resourceProvider: resourceProvider);
+          includedPaths: [root],
+          excludedPaths: excludedPaths.map((p) => '$root/$p').toList(),
+          resourceProvider: resourceProvider,
+        );
 
         for (AnalysisContext context in collection.contexts) {
           // Add custom lints.
