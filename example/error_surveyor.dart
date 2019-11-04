@@ -30,9 +30,9 @@ main(List<String> args) async {
           .map((f) => f.path)
           .toList()
             ..sort();
-      dirCount = args.length;
-      print('(Found $dirCount subdirectories.)');
+      print('(Found ${args.length} subdirectories.)');
     }
+    dirCount = args.length;
   }
 
   if (_debuglimit != null) {
