@@ -18,8 +18,6 @@ class Package {
     return {};
   }
 
-  File get pubspecFile => File('${dir.path}/pubspec.yaml');
-
   File get packagesFile => File('${dir.path}/.packages');
 
   Map<dynamic, yaml.YamlNode> get pubspec {
@@ -33,6 +31,8 @@ class Package {
     }
     return <dynamic, yaml.YamlNode>{};
   }
+
+  File get pubspecFile => File('${dir.path}/pubspec.yaml');
 
   Future<bool> installDependencies({bool force = false}) async {
     if (!force && _installer.hasDependenciesInstalled(this)) {

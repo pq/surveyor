@@ -61,6 +61,12 @@ class ApiUseCollector extends RecursiveAstVisitor
   ApiUseCollector();
 
   @override
+  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
+    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    // Reporting done in visitSimpleIdentifier.
+  }
+
+  @override
   void preAnalysis(AnalysisContext context,
       {bool subDir, DriverCommands commandCallback}) {
     if (subDir) {
@@ -70,6 +76,16 @@ class ApiUseCollector extends RecursiveAstVisitor
     String dirName = path.basename(context.contextRoot.root.path);
 
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
+  }
+
+  @override
+  void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
+
+  @override
+  void setLineInfo(LineInfo lineInfo) {
+    this.lineInfo = lineInfo;
   }
 
   @override
@@ -94,21 +110,5 @@ class ApiUseCollector extends RecursiveAstVisitor
     }
 
     return super.visitMethodInvocation(node);
-  }
-
-  @override
-  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
-    // Reporting done in visitSimpleIdentifier.
-  }
-
-  @override
-  void setLineInfo(LineInfo lineInfo) {
-    this.lineInfo = lineInfo;
-  }
-
-  @override
-  void setFilePath(String filePath) {
-    this.filePath = filePath;
   }
 }

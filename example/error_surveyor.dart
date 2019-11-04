@@ -54,6 +54,9 @@ main(List<String> args) async {
 
 int dirCount;
 
+/// If non-null, stops once limit is reached (for debugging).
+int _debuglimit;
+
 class AnalysisAdvisor extends SimpleAstVisitor
     implements
         PreAnalysisCallback,
@@ -68,6 +71,11 @@ class AnalysisAdvisor extends SimpleAstVisitor
   AnalysisAdvisor() {
     stats = AnalysisStats();
     formatter = HumanErrorFormatter(stdout, stats);
+  }
+
+  @override
+  void onVisitFinished() {
+    stats.print();
   }
 
   @override
@@ -90,6 +98,16 @@ class AnalysisAdvisor extends SimpleAstVisitor
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
 
+  @override
+  void reportError(AnalysisResultWithErrors result) {
+    final errors = result.errors.where(showError).toList();
+    if (errors.isEmpty) {
+      return;
+    }
+    formatter.formatErrors([AnalysisErrorInfoImpl(errors, result.lineInfo)]);
+    formatter.flush();
+  }
+
   bool showError(AnalysisError error) {
     final errorType = error.errorCode.type;
     if (errorType == ErrorType.HINT ||
@@ -101,22 +119,4 @@ class AnalysisAdvisor extends SimpleAstVisitor
     //print('${error.errorCode.type} :  ${error.errorCode.name}');
     return true;
   }
-
-  @override
-  void reportError(AnalysisResultWithErrors result) {
-    final errors = result.errors.where(showError).toList();
-    if (errors.isEmpty) {
-      return;
-    }
-    formatter.formatErrors([AnalysisErrorInfoImpl(errors, result.lineInfo)]);
-    formatter.flush();
-  }
-
-  @override
-  void onVisitFinished() {
-    stats.print();
-  }
-}
-
-/// If non-null, stops once limit is reached (for debugging).
-int _debuglimit; // = 300;
+} // = 300;

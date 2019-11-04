@@ -82,6 +82,19 @@ class WidgetCollector extends RecursiveAstVisitor
   WidgetCollector();
 
   @override
+  void postAnalysis(AnalysisContext context, DriverCommands _) {
+    write2Grams();
+    writeWidgetCounts();
+  }
+
+  @override
+  void preAnalysis(AnalysisContext context,
+      {bool subDir, DriverCommands commandCallback}) {
+    dirName = path.basename(context.contextRoot.root.path);
+    print("Analyzing '$dirName'...");
+  }
+
+  @override
   visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
@@ -102,19 +115,6 @@ class WidgetCollector extends RecursiveAstVisitor
     } else {
       super.visitInstanceCreationExpression(node);
     }
-  }
-
-  @override
-  void preAnalysis(AnalysisContext context,
-      {bool subDir, DriverCommands commandCallback}) {
-    dirName = path.basename(context.contextRoot.root.path);
-    print("Analyzing '$dirName'...");
-  }
-
-  @override
-  void postAnalysis(AnalysisContext context, DriverCommands _) {
-    write2Grams();
-    writeWidgetCounts();
   }
 
   void write2Grams() {

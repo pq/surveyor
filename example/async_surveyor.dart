@@ -44,15 +44,6 @@ int dirCount;
 /// If non-zero, stops once limit is reached (for debugging).
 int _debuglimit; //500;
 
-class Occurences {
-  int decls = 0;
-  int notDecls = 0;
-  Set<String> packages = <String>{};
-
-  @override
-  String toString() => '[$decls, $notDecls] : $packages';
-}
-
 class AsyncCollector extends RecursiveAstVisitor
     implements
         PostVisitCallback,
@@ -91,6 +82,12 @@ class AsyncCollector extends RecursiveAstVisitor
   }
 
   @override
+  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
+    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    // Reporting done in visitSimpleIdentifier.
+  }
+
+  @override
   void preAnalysis(AnalysisContext context,
       {bool subDir, DriverCommands commandCallback}) {
     if (subDir) {
@@ -100,6 +97,16 @@ class AsyncCollector extends RecursiveAstVisitor
     String dirName = path.basename(context.contextRoot.root.path);
 
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
+  }
+
+  @override
+  void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
+
+  @override
+  void setLineInfo(LineInfo lineInfo) {
+    this.lineInfo = lineInfo;
   }
 
   @override
@@ -129,20 +136,13 @@ class AsyncCollector extends RecursiveAstVisitor
     }
     return super.visitSimpleIdentifier(node);
   }
+}
+
+class Occurences {
+  int decls = 0;
+  int notDecls = 0;
+  Set<String> packages = <String>{};
 
   @override
-  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
-    // Reporting done in visitSimpleIdentifier.
-  }
-
-  @override
-  void setLineInfo(LineInfo lineInfo) {
-    this.lineInfo = lineInfo;
-  }
-
-  @override
-  void setFilePath(String filePath) {
-    this.filePath = filePath;
-  }
+  String toString() => '[$decls, $notDecls] : $packages';
 }

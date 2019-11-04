@@ -29,20 +29,7 @@ class Driver {
   /// Hook to contribute custom pubspec analysis.
   PubspecVisitor pubspecVisitor;
 
-  /// List of paths to exclude from analysis.
-  /// For example:
-  /// ```
-  ///   driver.excludedPaths = ['example', 'test'];
-  /// ```
-  /// excludes package `example` and `test` directories.
-  set excludedPaths(List<String> excludedPaths) {
-    _excludedPaths = excludedPaths;
-  }
-
   List<String> _excludedPaths;
-
-  /// List of paths to exclude from analysis.
-  List<String> get excludedPaths => _excludedPaths ?? [];
 
   bool showErrors = true;
 
@@ -68,6 +55,19 @@ class Driver {
       ..addFlag('color', help: 'color output.');
     var argResults = argParser.parse(args);
     return Driver(argResults);
+  }
+
+  /// List of paths to exclude from analysis.
+  List<String> get excludedPaths => _excludedPaths ?? [];
+
+  /// List of paths to exclude from analysis.
+  /// For example:
+  /// ```
+  ///   driver.excludedPaths = ['example', 'test'];
+  /// ```
+  /// excludes package `example` and `test` directories.
+  set excludedPaths(List<String> excludedPaths) {
+    _excludedPaths = excludedPaths;
   }
 
   bool get forcePackageInstall => options.forceInstall;

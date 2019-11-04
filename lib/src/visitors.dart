@@ -7,14 +7,19 @@ import 'package:analyzer/source/line_info.dart';
 import 'common.dart';
 import 'driver.dart';
 
+/// A simple visitor for analysis options files.
+abstract class AnalysisOptionsVisitor {
+  void visit(AnalysisOptionsFile file) {}
+}
+
 abstract class AstContext {
   void setFilePath(String filePath);
   void setLineInfo(LineInfo lineInfo);
 }
 
-/// A simple visitor for analysis options files.
-abstract class AnalysisOptionsVisitor {
-  void visit(AnalysisOptionsFile file) {}
+/// Hook for custom error reporting.
+abstract class ErrorReporter {
+  void reportError(AnalysisResultWithErrors result);
 }
 
 class OptionsVisitor extends AnalysisOptionsVisitor {
@@ -24,14 +29,13 @@ class OptionsVisitor extends AnalysisOptionsVisitor {
   }
 }
 
-/// Hook for custom error reporting.
-abstract class ErrorReporter {
-  void reportError(AnalysisResultWithErrors result);
-}
-
 /// A simple visitor for package roots.
 abstract class PackageRootVisitor {
   void visit(Directory root) {}
+}
+
+abstract class PostAnalysisCallback {
+  void postAnalysis(AnalysisContext context, DriverCommands commandCallback);
 }
 
 abstract class PostVisitCallback {
@@ -41,10 +45,6 @@ abstract class PostVisitCallback {
 abstract class PreAnalysisCallback {
   void preAnalysis(AnalysisContext context,
       {bool subDir, DriverCommands commandCallback});
-}
-
-abstract class PostAnalysisCallback {
-  void postAnalysis(AnalysisContext context, DriverCommands commandCallback);
 }
 
 /// A simple visitor for pubspec files.
