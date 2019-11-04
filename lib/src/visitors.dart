@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:surveyor/src/driver.dart';
 
 import 'common.dart';
+import 'driver.dart';
 
 abstract class AstContext {
   void setFilePath(String filePath);

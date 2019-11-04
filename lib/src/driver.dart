@@ -11,9 +11,9 @@ import 'package:analyzer/src/lint/registry.dart';
 import 'package:analyzer/src/services/lint.dart';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
-import 'package:surveyor/src/install.dart';
 
 import 'common.dart';
+import 'install.dart';
 import 'visitors.dart';
 
 class Driver {
@@ -27,6 +27,10 @@ class Driver {
 
   /// Hook to contribute custom pubspec analysis.
   PubspecVisitor pubspecVisitor;
+
+  /// List of globs describing files to be excluded from analysis.
+  /// See: https://dart.dev/guides/language/analysis-options#excluding-files
+  List<String> excludes;
 
   bool showErrors = true;
 
