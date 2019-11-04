@@ -137,9 +137,11 @@ class Driver {
         for (AnalysisContext context in collection.contexts) {
           // Add custom lints.
           if (lints != null) {
-            var definedRules = context.analysisOptions.lintRules;
-            var options = context.analysisOptions as AnalysisOptionsImpl;
-            options.lintRules = definedRules.toList()..addAll(lints);
+            final options = context.analysisOptions as AnalysisOptionsImpl;
+            options.lintRules =  context.analysisOptions.lintRules.toList();
+            for (var lint in lints) {
+              options.lintRules.add(lint);
+            }
             options.lint = true;
           }
           final dir = context.contextRoot.root.path;
