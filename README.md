@@ -28,7 +28,19 @@ will analyze projects at the given path and identify places where `"async"` is u
 Note that this generates a lot of output.  To make sure none of it is lost, consider redirecting to a file.  For example:
 
     dart example/async_surveyor.dart  <path>  2>&1 | tee survey_out.txt
-    
+
+### Surveying Errors
+
+    dart bin/example/error_surveyor.dart <path_to_project>
+
+will analyze projects at the given path, filtering for errors.
+
+### Surveying Lint Rule Violations
+
+    dart bin/example/lint_surveyor.dart <path_to_project>
+
+will analyze projects at the given path and identify violations of lint rules (custom rules or ones defined by `package:linter`).
+
 ### Surveying Widget Use
 
     dart example/widget_surveyor.dart <path_to_project>
@@ -52,7 +64,6 @@ null -> Scaffold, 1
 ```
 
 (Note that by default package dependencies will only be installed if a `.packages` file is absent from the project under analysis.  If you want to make sure package dependencies are (re)installed, run with the `--force-install` option.)
-    
 
 ## Features and bugs
 
