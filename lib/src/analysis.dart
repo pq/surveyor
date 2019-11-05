@@ -1,11 +1,13 @@
 import 'dart:io' as io;
 
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/generated/engine.dart';
 import 'package:analyzer/src/generated/source.dart';
+import 'package:analyzer/src/workspace/workspace.dart';
 import 'package:path/path.dart' as path;
 
 final Map<String, int> _severityCompare = {
@@ -15,6 +17,13 @@ final Map<String, int> _severityCompare = {
   'lint': 2,
   'hint': 1,
 };
+
+WorkspacePackage getPackage(CompilationUnit unit) {
+  final element = unit.declaredElement;
+  final libraryPath = element.library.source.source.fullName;
+  final workspace = element.session?.analysisContext?.workspace;
+  return workspace?.findPackageFor(libraryPath);
+}
 
 bool implementsInterface(DartType type, String interface, String library) {
   if (type is! InterfaceType) {
@@ -26,8 +35,34 @@ bool implementsInterface(DartType type, String interface, String library) {
       !element.isSynthetic && element.allSupertypes.any(predicate);
 }
 
+/// Returns `true` if this [node] is the child of a private compilation unit
+/// member.
+bool inPrivateMember(AstNode node) {
+  AstNode parent = node.parent;
+  if (parent is NamedCompilationUnitMember) {
+    return isPrivate(parent.name);
+  }
+  if (parent is ExtensionDeclaration) {
+    return parent.name == null || isPrivate(parent.name);
+  }
+  return false;
+}
+
+/// Return true if this compilation unit [node] is declared within the given
+/// [package]'s `lib/` directory tree.
+bool isInLibDir(CompilationUnit node, WorkspacePackage package) {
+  final cuPath = node.declaredElement.library?.source?.fullName;
+  if (cuPath == null) return false;
+  final libDir = path.join(package.root, 'lib');
+  return path.isWithin(libDir, cuPath);
+}
+
 bool isInterface(InterfaceType type, String interface, String library) =>
     type.name == interface && type.element.library.name == library;
+
+/// Check if the given identifier has a private name.
+bool isPrivate(SimpleIdentifier identifier) =>
+    identifier != null ? Identifier.isPrivateName(identifier.name) : false;
 
 bool isWidgetType(DartType type) => implementsInterface(type, 'Widget', '');
 
