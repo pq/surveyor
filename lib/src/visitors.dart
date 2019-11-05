@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import 'common.dart';
@@ -35,7 +36,7 @@ abstract class PackageRootVisitor {
 }
 
 abstract class PostAnalysisCallback {
-  void postAnalysis(AnalysisContext context, DriverCommands commandCallback);
+  void postAnalysis(SurveyorContext context, DriverCommands commandCallback);
 }
 
 abstract class PostVisitCallback {
@@ -43,11 +44,17 @@ abstract class PostVisitCallback {
 }
 
 abstract class PreAnalysisCallback {
-  void preAnalysis(AnalysisContext context,
+  void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback});
 }
 
 /// A simple visitor for pubspec files.
 abstract class PubspecVisitor {
   void visit(PubspecFile file) {}
+}
+
+class SurveyorContext {
+  final AnalysisContext analysisContext;
+  final TypeSystem typeSystem;
+  SurveyorContext(this.analysisContext, this.typeSystem);
 }
