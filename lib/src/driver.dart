@@ -88,14 +88,14 @@ class Driver {
   Future analyze({bool forceInstall}) => _analyze(sources);
 
   /// Hook to influence context post analysis.
-  void postAnalyze(AnalysisContext context, DriverCommands callback) {
+  void postAnalyze(SurveyorContext context, DriverCommands callback) {
     if (visitor is PostAnalysisCallback) {
       (visitor as PostAnalysisCallback).postAnalysis(context, callback);
     }
   }
 
   /// Hook to influence context before analysis.
-  void preAnalyze(AnalysisContext context, {bool subDir}) {
+  void preAnalyze(SurveyorContext context, {bool subDir}) {
     if (visitor is PreAnalysisCallback) {
       (visitor as PreAnalysisCallback).preAnalysis(context, subDir: subDir);
     }
@@ -157,7 +157,10 @@ class Driver {
             continue;
           }
 
-          preAnalyze(context, subDir: dir != root);
+          final typeSystem = await context.currentSession.typeSystem;
+          final surveyorContext = SurveyorContext(context, typeSystem);
+
+          preAnalyze(surveyorContext, subDir: dir != root);
 
           for (String filePath in context.contextRoot.analyzedFiles()) {
             if (AnalysisEngine.isDartFileName(filePath)) {
@@ -201,7 +204,7 @@ class Driver {
           }
 
           await pumpEventQueue(times: 512);
-          postAnalyze(context, cmd);
+          postAnalyze(surveyorContext, cmd);
         }
       }
     }
