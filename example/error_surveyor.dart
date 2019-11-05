@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
@@ -79,17 +78,17 @@ class AnalysisAdvisor extends SimpleAstVisitor
   }
 
   @override
-  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
+  void postAnalysis(SurveyorContext context, DriverCommands cmd) {
     cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
   }
 
   @override
-  void preAnalysis(AnalysisContext context,
+  void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback}) {
     if (subDir) {
       ++dirCount;
     }
-    final root = context.contextRoot.root;
+    final root = context.analysisContext.contextRoot.root;
     String dirName = path.basename(root.path);
     if (subDir) {
       // Qualify.

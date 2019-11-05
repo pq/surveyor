@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -82,15 +81,15 @@ class WidgetCollector extends RecursiveAstVisitor
   WidgetCollector();
 
   @override
-  void postAnalysis(AnalysisContext context, DriverCommands _) {
+  void postAnalysis(SurveyorContext context, DriverCommands _) {
     write2Grams();
     writeWidgetCounts();
   }
 
   @override
-  void preAnalysis(AnalysisContext context,
+  void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback}) {
-    dirName = path.basename(context.contextRoot.root.path);
+    dirName = path.basename(context.analysisContext.contextRoot.root.path);
     print("Analyzing '$dirName'...");
   }
 

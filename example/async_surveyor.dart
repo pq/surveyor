@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/file_system/file_system.dart' hide File;
 import 'package:analyzer/source/line_info.dart';
 import 'package:path/path.dart' as path;
@@ -82,19 +83,20 @@ class AsyncCollector extends RecursiveAstVisitor
   }
 
   @override
-  void postAnalysis(AnalysisContext context, DriverCommands cmd) {
+  void postAnalysis(SurveyorContext context, DriverCommands cmd) {
     cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
   @override
-  void preAnalysis(AnalysisContext context,
+  void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback}) {
     if (subDir) {
       ++dirCount;
     }
-    currentFolder = context.contextRoot.root;
-    String dirName = path.basename(context.contextRoot.root.path);
+    final contextRoot = context.analysisContext.contextRoot;
+    currentFolder = contextRoot.root;
+    final dirName = path.basename(contextRoot.root.path);
 
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
