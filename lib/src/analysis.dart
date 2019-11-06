@@ -66,7 +66,7 @@ bool isPrivate(SimpleIdentifier identifier) =>
 
 bool isWidgetType(DartType type) => implementsInterface(type, 'Widget', '');
 
-String _pluralize(String word, int count) => count == 1 ? word : word + 's';
+String _pluralize(String word, int count) => count == 1 ? word : '${word}s';
 
 /// Given an absolute path, return a relative path if the file is contained in
 /// the current directory; return the original path otherwise.
@@ -250,8 +250,8 @@ abstract class ErrorFormatter {
   void formatErrors(List<AnalysisErrorInfo> errorInfos) {
     stats.unfilteredCount += errorInfos.length;
 
-    final errors = List<AnalysisError>();
-    final errorToLine = Map<AnalysisError, LineInfo>();
+    final errors = <AnalysisError>[];
+    final errorToLine = <AnalysisError, LineInfo>{};
     for (var errorInfo in errorInfos) {
       for (var error in errorInfo.errors) {
         if (_computeSeverity(error) != null) {
@@ -277,15 +277,14 @@ class HumanErrorFormatter extends ErrorFormatter {
   bool displayCorrections;
 
   // This is a Set in order to de-dup CLI errors.
-  final Set<CLIError> batchedErrors = Set();
+  final Set<CLIError> batchedErrors = {};
 
   HumanErrorFormatter(StringSink out, AnalysisStats stats,
       {SeverityProcessor severityProcessor,
       bool ansiColor = false,
-      bool displayCorrections = false})
+      this.displayCorrections = false})
       : super(out, stats, severityProcessor: severityProcessor) {
     ansi = AnsiLogger(ansiColor);
-    this.displayCorrections = displayCorrections;
   }
 
   @override
