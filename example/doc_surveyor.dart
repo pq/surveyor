@@ -20,8 +20,14 @@ main(List<String> args) async {
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
+      final dirs = <String>[];
       print("Recursing into '$dir'...");
-      args = Directory(dir).listSync().map((f) => f.path).toList()..sort();
+      for (var listing in Directory(dir).listSync()) {
+        if (listing is Directory) {
+          dirs.add(listing.path);
+        }
+      }
+      args = dirs..sort();
       dirCount = args.length;
       print('(Found $dirCount subdirectories.)');
     }
@@ -34,8 +40,8 @@ main(List<String> args) async {
   final stopwatch = Stopwatch()..start();
 
   final driver = Driver.forArgs(args);
-  driver.forceSkipInstall = true;
-  driver.showErrors = false;
+  driver.forceSkipInstall = false;
+  driver.showErrors = true;
   driver.resolveUnits = true;
   driver.visitor = _Visitor();
 
@@ -53,7 +59,7 @@ int totalPublicElements = 0;
 /// If non-zero, stops once limit is reached (for debugging).
 int _debuglimit;
 
-class _Visitor extends SimpleAstVisitor
+class _Visitor extends RecursiveAstVisitor
     implements PreAnalysisCallback, PostAnalysisCallback, AstContext {
   bool isInLibFolder;
 
