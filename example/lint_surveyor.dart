@@ -95,7 +95,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
       ++dirCount;
     }
     final root = context.analysisContext.contextRoot.root;
-    String dirName = path.basename(root.path);
+    var dirName = path.basename(root.path);
     if (subDir) {
       // Qualify.
       dirName = '${path.basename(root.parent.path)}/$dirName';

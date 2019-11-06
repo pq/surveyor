@@ -99,7 +99,7 @@ class WidgetCollector extends RecursiveAstVisitor
     if (isWidgetType(type)) {
       widgets.update(type, (v) => v + 1, ifAbsent: () => 1);
 
-      DartType parent =
+      final parent =
           enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
 
       twoGrams.add(TwoGram(parent, type));

@@ -1,6 +1,5 @@
 import 'dart:io' as io;
 
-import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -128,13 +127,13 @@ class Driver {
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
-        AnalysisContextCollection collection = AnalysisContextCollection(
+        final collection = AnalysisContextCollection(
           includedPaths: [root],
           excludedPaths: excludedPaths.map((p) => '$root/$p').toList(),
           resourceProvider: resourceProvider,
         );
 
-        for (AnalysisContext context in collection.contexts) {
+        for (var context in collection.contexts) {
           // Add custom lints.
           if (lints != null) {
             final options = context.analysisOptions as AnalysisOptionsImpl;
@@ -162,7 +161,7 @@ class Driver {
 
           preAnalyze(surveyorContext, subDir: dir != root);
 
-          for (String filePath in context.contextRoot.analyzedFiles()) {
+          for (var filePath in context.contextRoot.analyzedFiles()) {
             if (AnalysisEngine.isDartFileName(filePath)) {
               try {
                 final result = resolveUnits
@@ -174,7 +173,7 @@ class Driver {
                     (visitor as ErrorReporter).reportError(result);
                   }
                   if (visitor is AstContext) {
-                    AstContext astContext = visitor as AstContext;
+                    final astContext = visitor as AstContext;
                     astContext.setLineInfo(result.lineInfo);
                     astContext.setFilePath(filePath);
                   }
