@@ -1,0 +1,12 @@
+name: doc_computer
+description: Sample project that computes missing API doc stats.
+
+environment:
+  sdk: '>=2.2.0 <3.0.0'
+
+dependencies:
+  surveyor:
+    # todo(pq): update when surveyor gets published.
+    git:
+     url: https://github.com/pq/surveyor
+     ref: f9791465f3f77b2ffca4bf9517ce2982b432df51
