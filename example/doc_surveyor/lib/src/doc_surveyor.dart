@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/analysis_context.dart';
@@ -36,7 +38,6 @@ Future<DocStats> analyzeDocs(String packageFolder) async {
 class DocStats {
   int publicMemberCount = 0;
   final List<SourceLocation> undocumentedMemberLocations = <SourceLocation>[];
-  DocStats();
 }
 
 class SourceLocation {
