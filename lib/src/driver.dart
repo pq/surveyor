@@ -40,6 +40,8 @@ class Driver {
 
   bool forceSkipInstall = false;
 
+  bool silent = false;
+
   Driver(ArgResults argResults)
       : options = CommandLineOptions.fromArgs(argResults),
         sources = argResults.rest
@@ -107,7 +109,9 @@ class Driver {
     }
     ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
     await _analyzeFiles(resourceProvider, sourceDirs);
-    print('Finished.');
+    if (!silent) {
+      print('Finished.');
+    }
   }
 
   Future _analyzeFiles(
@@ -121,7 +125,9 @@ class Driver {
     }
 
     // Analyze.
-    print('Analyzing...');
+    if (!silent) {
+      print('Analyzing...');
+    }
 
     final cmd = DriverCommands();
 
