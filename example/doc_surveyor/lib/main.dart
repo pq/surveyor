@@ -14,7 +14,9 @@ main(List<String> args) async {
   print('${stats.publicMemberCount} public members');
   print('Members without docs:');
   final locations = stats.undocumentedMemberLocations;
-  locations.forEach((l) => print(l.asString()));
+  for (var location in locations) {
+    print(location.asString());
+  }
 
   final score =
       ((stats.publicMemberCount - locations.length) / stats.publicMemberCount)

@@ -5,9 +5,9 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:analyzer/src/generated/engine.dart';
-import 'package:analyzer/src/generated/source.dart';
-import 'package:analyzer/src/workspace/workspace.dart';
+import 'package:analyzer/src/generated/engine.dart';  // ignore: implementation_imports
+import 'package:analyzer/src/generated/source.dart';  // ignore: implementation_imports
+import 'package:analyzer/src/workspace/workspace.dart'; // ignore: implementation_imports
 import 'package:path/path.dart' as path;
 
 final Map<String, int> _severityCompare = {
@@ -79,11 +79,10 @@ ErrorSeverity _severityIdentity(AnalysisError error) =>
 
 /// Returns desired severity for the given [error] (or `null` if it's to be
 /// suppressed).
-typedef ErrorSeverity SeverityProcessor(AnalysisError error);
+typedef SeverityProcessor = ErrorSeverity Function(AnalysisError error);
 
 /// Analysis statistics counter.
 class AnalysisStats {
-  /// The total number of diagnostics sent to [formatErrors].
   int unfilteredCount = 0;
 
   int errorCount = 0;

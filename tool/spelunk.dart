@@ -96,8 +96,9 @@ class _SourceVisitor extends GeneralizingAstVisitor {
   write(AstNode node) {
     //EOL comments
     var comments = getPrecedingComments(node.beginToken);
-    comments.forEach((c) => sink.writeln('${"  " * indent}$c'));
-
+    for (var c in comments) {
+      sink.writeln('${"  " * indent}$c');
+    }
     sink.writeln(
         '${"  " * indent}${asString(node)} ${getTrailingComment(node)}');
   }

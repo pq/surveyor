@@ -5,10 +5,10 @@ import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/generated/engine.dart'
+import 'package:analyzer/src/generated/engine.dart' // ignore: implementation_imports
     show AnalysisEngine, AnalysisOptionsImpl;
-import 'package:analyzer/src/lint/registry.dart';
-import 'package:analyzer/src/services/lint.dart';
+import 'package:analyzer/src/lint/registry.dart'; // ignore: implementation_imports
+import 'package:analyzer/src/services/lint.dart'; // ignore: implementation_imports
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 
@@ -174,7 +174,7 @@ class Driver {
               try {
                 final result = resolveUnits
                     ? await context.currentSession.getResolvedUnit(filePath)
-                    : await context.currentSession.getParsedUnit(filePath);
+                    : context.currentSession.getParsedUnit(filePath);
 
                 if (visitor != null) {
                   if (visitor is ErrorReporter) {
