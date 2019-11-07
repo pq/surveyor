@@ -5,8 +5,8 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/source/line_info.dart';
-import 'package:analyzer/src/generated/engine.dart';  // ignore: implementation_imports
-import 'package:analyzer/src/generated/source.dart';  // ignore: implementation_imports
+import 'package:analyzer/src/generated/engine.dart'; // ignore: implementation_imports
+import 'package:analyzer/src/generated/source.dart'; // ignore: implementation_imports
 import 'package:analyzer/src/workspace/workspace.dart'; // ignore: implementation_imports
 import 'package:path/path.dart' as path;
 

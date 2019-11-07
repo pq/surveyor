@@ -6,7 +6,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:analyzer/src/generated/engine.dart' // ignore: implementation_imports
-    show AnalysisEngine, AnalysisOptionsImpl;
+    show
+        AnalysisEngine,
+        AnalysisOptionsImpl;
 import 'package:analyzer/src/lint/registry.dart'; // ignore: implementation_imports
 import 'package:analyzer/src/services/lint.dart'; // ignore: implementation_imports
 import 'package:args/args.dart';
