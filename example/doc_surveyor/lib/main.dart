@@ -1,4 +1,4 @@
-import 'src/doc_computer.dart';
+import 'src/doc_surveyor.dart';
 
 /// Example run:
 ///
