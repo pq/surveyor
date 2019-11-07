@@ -120,7 +120,7 @@ class Driver {
       print('(Skipping dependency checks.)');
     }
 
-    if ( excludedPaths.isNotEmpty) {
+    if (excludedPaths.isNotEmpty) {
       if (!silent) {
         print('(Excluding paths $excludedPaths from analysis.)');
       }
