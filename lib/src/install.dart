@@ -58,7 +58,8 @@ class _Installer {
     }
 
     if (package.dependencies?.containsKey('flutter') == true) {
-      print('Running "flutter packages get" in ${pathutil.basename(sourcePath)}');
+      print(
+          'Running "flutter packages get" in ${pathutil.basename(sourcePath)}');
       return Process.run('flutter', ['packages', 'get'],
           workingDirectory: sourcePath, runInShell: true);
     }
