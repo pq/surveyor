@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as pathutil;
 import 'package:yaml/yaml.dart' as yaml;
 
 class Package {
@@ -18,7 +17,7 @@ class Package {
     return {};
   }
 
-  File get packagesFile => File('${dir.path}/.packages');
+  File get packagesFile => File(pathutil.join(dir.path, '.packages'));
 
   Map<dynamic, yaml.YamlNode> get pubspec {
     final file = pubspecFile;
@@ -32,7 +31,7 @@ class Package {
     return <dynamic, yaml.YamlNode>{};
   }
 
-  File get pubspecFile => File('${dir.path}/pubspec.yaml');
+  File get pubspecFile => File(pathutil.join(dir.path, 'pubspec.yaml'));
 
   Future<bool> installDependencies({bool force = false}) async {
     if (!force && _installer.hasDependenciesInstalled(this)) {
@@ -59,12 +58,12 @@ class _Installer {
     }
 
     if (package.dependencies?.containsKey('flutter') == true) {
-      print('Running "flutter packages get" in ${path.basename(sourcePath)}');
+      print('Running "flutter packages get" in ${pathutil.basename(sourcePath)}');
       return Process.run('flutter', ['packages', 'get'],
-          workingDirectory: sourcePath);
+          workingDirectory: sourcePath, runInShell: true);
     }
 
-    print('Running "pub get" in ${path.basename(sourcePath)}');
+    print('Running "pub get" in ${pathutil.basename(sourcePath)}');
     return Process.run('pub', ['get'], workingDirectory: sourcePath);
   }
 }
