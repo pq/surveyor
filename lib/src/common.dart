@@ -33,8 +33,7 @@ double toDouble(Object value) {
   }
   try {
     return double.parse(value);
-  } on FormatException catch (e) {
-    print('expected double value but got "$value": ${e.message}');
+  } on FormatException {
     rethrow;
   }
 }
@@ -45,8 +44,7 @@ int toInt(Object value) {
   }
   try {
     return int.parse(value);
-  } on FormatException catch (e) {
-    print('expected int value but got "$value": ${e.message}');
+  } on FormatException {
     rethrow;
   }
 }
