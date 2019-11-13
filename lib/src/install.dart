@@ -65,6 +65,7 @@ class _Installer {
     }
 
     print('Running "pub get" in ${pathutil.basename(sourcePath)}');
-    return Process.run('pub', ['get'], workingDirectory: sourcePath);
+    return Process.run('pub', ['get'],
+        workingDirectory: sourcePath, runInShell: true);
   }
 }
