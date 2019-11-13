@@ -15,7 +15,7 @@ import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
 
-Future<DocStats> analyzeDocs(String packageFolder) async {
+Future<DocStats> analyzeDocs(String packageFolder, {bool silent =  true}) async {
   final pubspec = path.join(packageFolder, 'pubspec.yaml');
   if (!File(pubspec).existsSync()) {
     throw Exception('File not found: $pubspec');
@@ -26,7 +26,7 @@ Future<DocStats> analyzeDocs(String packageFolder) async {
   driver.excludedPaths = ['example', 'test'];
   driver.showErrors = true;
   driver.resolveUnits = true;
-  driver.silent = true;
+  driver.silent = silent;
   final visitor = _Visitor();
   driver.visitor = visitor;
 
