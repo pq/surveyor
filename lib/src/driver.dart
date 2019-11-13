@@ -106,32 +106,26 @@ class Driver {
 
   Future _analyze(List<String> sourceDirs, {bool forceInstall}) async {
     if (sourceDirs.isEmpty) {
-      print('Specify one or more files and directories.');
+      _print('Specify one or more files and directories.');
       return;
     }
     ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
     await _analyzeFiles(resourceProvider, sourceDirs);
-    if (!silent) {
-      print('Finished.');
-    }
+    _print('Finished.');
   }
 
   Future _analyzeFiles(
       ResourceProvider resourceProvider, List<String> analysisRoots) async {
     if (skipPackageInstall) {
-      print('(Skipping dependency checks.)');
+      _print('(Skipping dependency checks.)');
     }
 
     if (excludedPaths.isNotEmpty) {
-      if (!silent) {
-        print('(Excluding paths $excludedPaths from analysis.)');
-      }
+      _print('(Excluding paths $excludedPaths from analysis.)');
     }
 
     // Analyze.
-    if (!silent) {
-      print('Analyzing...');
-    }
+    _print('Analyzing...');
 
     final cmd = DriverCommands();
 
@@ -157,12 +151,13 @@ class Driver {
           final package = Package(dir);
           // Ensure dependencies are installed.
           if (!skipPackageInstall) {
-            await package.installDependencies(force: forcePackageInstall);
+            await package.installDependencies(
+                force: forcePackageInstall, silent: silent);
           }
 
           // Skip analysis if no .packages.
           if (!package.packagesFile.existsSync()) {
-            print('No .packages in $dir (skipping analysis)');
+            _print('No .packages in $dir (skipping analysis)');
             continue;
           }
 
@@ -194,8 +189,8 @@ class Driver {
                   }
                 }
               } catch (e) {
-                print('Exception caught analyzing: $filePath');
-                print(e.toString());
+                _print('Exception caught analyzing: $filePath');
+                _print(e.toString());
               }
             }
 
@@ -220,6 +215,13 @@ class Driver {
 
     if (visitor is PostVisitCallback) {
       (visitor as PostVisitCallback).onVisitFinished();
+    }
+  }
+
+  /// Display the following [msg] to stdout iff [silent] is false.
+  void _print(String msg) {
+    if (!silent) {
+      print(msg);
     }
   }
 }

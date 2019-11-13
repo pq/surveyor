@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:path/path.dart' as pathutil;
 import 'package:yaml/yaml.dart' as yaml;
 
@@ -33,12 +34,13 @@ class Package {
 
   File get pubspecFile => File(pathutil.join(dir.path, 'pubspec.yaml'));
 
-  Future<bool> installDependencies({bool force = false}) async {
+  Future<bool> installDependencies(
+      {bool force = false, bool silent = false}) async {
     if (!force && _installer.hasDependenciesInstalled(this)) {
       return false;
     }
 
-    await _installer.installDependencies(this);
+    await _installer.installDependencies(this, silent: silent);
     return true;
   }
 }
@@ -47,10 +49,12 @@ class _Installer {
   bool hasDependenciesInstalled(Package package) =>
       package.dir.existsSync() && package.packagesFile.existsSync();
 
-  Future<ProcessResult> installDependencies(Package package) async {
+  Future<ProcessResult> installDependencies(Package package,
+      {bool silent = false}) async {
     final sourcePath = package.dir.path;
     if (!package.dir.existsSync()) {
-      print('Unable to install dependencies: $sourcePath does not exist');
+      _print(
+          'Unable to install dependencies: $sourcePath does not exist', silent);
       return null;
     }
     if (!package.pubspecFile.existsSync()) {
@@ -58,14 +62,22 @@ class _Installer {
     }
 
     if (package.dependencies?.containsKey('flutter') == true) {
-      print(
-          'Running "flutter packages get" in ${pathutil.basename(sourcePath)}');
+      _print(
+          'Running "flutter packages get" in ${pathutil.basename(sourcePath)}',
+          silent);
       return Process.run('flutter', ['packages', 'get'],
           workingDirectory: sourcePath, runInShell: true);
     }
 
-    print('Running "pub get" in ${pathutil.basename(sourcePath)}');
+    _print('Running "pub get" in ${pathutil.basename(sourcePath)}', silent);
     return Process.run('pub', ['get'],
         workingDirectory: sourcePath, runInShell: true);
+  }
+
+  /// Display the following [msg] to stdout iff [silent] is false.
+  void _print(String msg, bool silent) {
+    if (!silent) {
+      print(msg);
+    }
   }
 }
