@@ -9,4 +9,4 @@ dependencies:
     # todo(pq): update when surveyor gets published.
     git:
      url: https://github.com/pq/surveyor
-     ref: f9791465f3f77b2ffca4bf9517ce2982b432df51
+     ref: 8f2d8c7e41d64a97509cc9c434339d114bcc74e8
