@@ -139,7 +139,7 @@ class Driver {
       if (cmd.continueAnalyzing) {
         final collection = AnalysisContextCollection(
           includedPaths: [root],
-          excludedPaths: excludedPaths.map((p) => '$root/$p').toList(),
+          excludedPaths: excludedPaths.map((p) => path.join(root, p)).toList(),
           resourceProvider: resourceProvider,
         );
 
