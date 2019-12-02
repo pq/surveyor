@@ -15,13 +15,13 @@ From there you can run the `examples`.
 
 ### Surveying API Use
 
-    dart bin/example/api_surveyor.dart <path_to_project>
+    dart example/api_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify uses of a few specific APIs.
 
 ### Surveying `async` Identifier Use
 
-    dart bin/example/async_surveyor.dart <path_to_project>
+    dart example/async_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify places where `"async"` is used as a simple identifer.  These places would produce errors if `async` become a reserved keyword.
 
@@ -31,13 +31,13 @@ Note that this generates a lot of output.  To make sure none of it is lost, cons
 
 ### Surveying Errors
 
-    dart bin/example/error_surveyor.dart <path_to_project>
+    dart example/error_surveyor.dart <path_to_project>
 
 will analyze projects at the given path, filtering for errors.
 
 ### Surveying Lint Rule Violations
 
-    dart bin/example/lint_surveyor.dart <path_to_project>
+    dart example/lint_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify violations of lint rules (custom rules or ones defined by `package:linter`).
 
