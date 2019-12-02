@@ -41,6 +41,22 @@ will analyze projects at the given path, filtering for errors.
 
 will analyze projects at the given path and identify violations of lint rules (custom rules or ones defined by `package:linter`).
 
+### Surveying API Doc Scoring
+
+    dart example/doc_surveyor/lib/main.dart <path_to_project>
+ 
+will analyze the project at the given path flagging public members that are missing API docs.
+
+A sample run produces output like this:
+
+```
+122 public members
+Members without docs:
+Void • <path-to-provider-repo>/packages/provider/lib/src/proxy_provider.dart • 107:1
+NumericProxyProvider • <path-to-provider-repo>/packages/provider/lib/src/proxy_provider.dart • 177:1
+Score: 0.98
+```
+
 ### Surveying Widget Use
 
     dart example/widget_surveyor.dart <path_to_project>
