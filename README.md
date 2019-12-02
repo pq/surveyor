@@ -81,6 +81,10 @@ null -> Scaffold, 1
 
 (Note that by default package dependencies will only be installed if a `.packages` file is absent from the project under analysis.  If you want to make sure package dependencies are (re)installed, run with the `--force-install` option.)
 
+## Related Work
+
+See also [`package:pub_crawl`][pub_crawl], which can be used to fetch package sources for analysis from pub.
+
 ## Features and bugs
 
 This is very much a work in progress.  Please file feature requests, bugs and any feedback in the [issue tracker][tracker].
@@ -88,3 +92,4 @@ This is very much a work in progress.  Please file feature requests, bugs and an
 Thanks!
 
 [tracker]: https://github.com/pq/surveyor/issues
+[pub_crawl]: https://github.com/pq/pub_crawl
