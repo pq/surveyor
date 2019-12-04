@@ -250,8 +250,7 @@ abstract class ErrorFormatter {
   SeverityProcessor _severityProcessor;
 
   ErrorFormatter(this.out, this.stats, {SeverityProcessor severityProcessor}) {
-    _severityProcessor =
-        severityProcessor == null ? _severityIdentity : severityProcessor;
+    _severityProcessor = severityProcessor ?? _severityIdentity;
   }
 
   /// Call to write any batched up errors from [formatErrors].

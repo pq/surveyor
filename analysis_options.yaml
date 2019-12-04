@@ -14,6 +14,7 @@ linter:
 #     - avoid_bool_literals_in_conditional_expressions # todo(pq): enable
      - avoid_function_literals_in_foreach_calls
      - avoid_null_checks_in_equality_operators
+#     - avoid_print # ensure all calls are rationalized (and silence-able)
      - avoid_private_typedef_functions
      - avoid_returning_null_for_future
      - await_only_futures
@@ -32,7 +33,7 @@ linter:
      - prefer_for_elements_to_map_fromIterable
      - prefer_function_declarations_over_variables
      - prefer_generic_function_type_aliases
-#     - prefer_if_null_operators  # todo(pq): enable
+     - prefer_if_null_operators
      - prefer_initializing_formals
      - prefer_inlined_adds
      - prefer_interpolation_to_compose_strings
