@@ -23,7 +23,7 @@ import 'src/doc_surveyor.dart';
 /// NumericProxyProvider • <path-to-provider-repo>/packages/provider/lib/src/proxy_provider.dart • 177:1
 /// Score: 0.98
 ///
-main(List<String> args) async {
+void main(List<String> args) async {
   final stats = await analyzeDocs(args[0], silent: true);
   print('${stats.publicMemberCount} public members');
   print('Members without docs:');
