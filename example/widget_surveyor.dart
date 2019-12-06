@@ -28,7 +28,7 @@ import 'package:surveyor/src/visitors.dart';
 /// Run like so:
 ///
 /// dart example/widget_surveyor.dart <source dir>
-main(List<String> args) async {
+void main(List<String> args) async {
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
@@ -108,7 +108,7 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
   @override
-  visitInstanceCreationExpression(InstanceCreationExpression node) {
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
       widgets.update(type, (v) => v + 1, ifAbsent: () => 1);

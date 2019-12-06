@@ -26,7 +26,7 @@ import 'package:analyzer/src/dart/scanner/scanner.dart';
 import 'package:analyzer/src/generated/parser.dart' show Parser;
 import 'package:analyzer/src/string_source.dart' show StringSource;
 
-main(List<String> args) {
+void main(List<String> args) {
   if (args.length != 1) {
     throw Exception('Provide a path to a file to spelunk');
   }
@@ -98,7 +98,7 @@ class _SourceVisitor extends GeneralizingAstVisitor {
   String typeInfo(Type type) => type.toString();
 
   @override
-  visitNode(AstNode node) {
+  void visitNode(AstNode node) {
     write(node);
 
     ++indent;
@@ -107,7 +107,7 @@ class _SourceVisitor extends GeneralizingAstVisitor {
     return null;
   }
 
-  write(AstNode node) {
+  void write(AstNode node) {
     //EOL comments
     var comments = getPrecedingComments(node.beginToken);
     for (var c in comments) {

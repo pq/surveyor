@@ -17,7 +17,7 @@ import 'dart:convert';
 import 'package:surveyor/src/common.dart';
 
 /// Find package authors.
-main(List<String> args) async {
+void main(List<String> args) async {
   var packages = [
     '_discoveryapis_commons',
     'alpha',

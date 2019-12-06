@@ -28,7 +28,7 @@ import 'package:surveyor/src/visitors.dart';
 /// Run like so:
 ///
 /// dart example/error_surveyor.dart <source dir>
-main(List<String> args) async {
+void main(List<String> args) async {
   final stopwatch = Stopwatch()..start();
 
   if (args.length == 1) {

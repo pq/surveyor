@@ -28,7 +28,7 @@ import 'package:surveyor/src/visitors.dart';
 /// Run like so:
 ///
 /// dart example/async_surveyor.dart <source dir>
-main(List<String> args) async {
+void main(List<String> args) async {
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
@@ -71,10 +71,10 @@ class AsyncCollector extends RecursiveAstVisitor
   Set<Folder> contextRoots = <Folder>{};
 
   // id: inDecl, notInDecl
-  Map<String, Occurences> occurrences = <String, Occurences>{
-    'async': Occurences(),
-    'await': Occurences(),
-    'yield': Occurences(),
+  Map<String, Occurrences> occurrences = <String, Occurrences>{
+    'async': Occurrences(),
+    'await': Occurrences(),
+    'yield': Occurrences(),
   };
 
   List<String> reports = <String>[];
@@ -124,7 +124,7 @@ class AsyncCollector extends RecursiveAstVisitor
   }
 
   @override
-  visitSimpleIdentifier(SimpleIdentifier node) {
+  void visitSimpleIdentifier(SimpleIdentifier node) {
     final id = node.name;
 
     if (occurrences.containsKey(id)) {
@@ -148,11 +148,11 @@ class AsyncCollector extends RecursiveAstVisitor
       contextRoots.add(currentFolder);
       print(occurrences);
     }
-    return super.visitSimpleIdentifier(node);
+    super.visitSimpleIdentifier(node);
   }
 }
 
-class Occurences {
+class Occurrences {
   int decls = 0;
   int notDecls = 0;
   Set<String> packages = <String>{};

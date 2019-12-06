@@ -15,7 +15,7 @@
 import 'dart:io';
 
 /// Find and delete duplicate packages in a directory.
-main(List<String> args) async {
+void main(List<String> args) async {
   final dir = args[0];
 
   final seen = <String, String>{};

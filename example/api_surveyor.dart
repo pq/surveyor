@@ -27,7 +27,7 @@ import 'package:surveyor/src/visitors.dart';
 /// Run like so:
 ///
 /// dart example/api_surveyor.dart <source dir>
-main(List<String> args) async {
+void main(List<String> args) async {
   if (args.length == 1) {
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
@@ -103,7 +103,7 @@ class ApiUseCollector extends RecursiveAstVisitor
   }
 
   @override
-  visitMethodInvocation(MethodInvocation node) {
+  void visitMethodInvocation(MethodInvocation node) {
     var location;
     final name = node.methodName.name;
     if (name == 'transform' || name == 'pipe') {
@@ -123,6 +123,6 @@ class ApiUseCollector extends RecursiveAstVisitor
           '${node.staticType.name}.$name: $filePath:${location.lineNumber}:${location.columnNumber}');
     }
 
-    return super.visitMethodInvocation(node);
+    super.visitMethodInvocation(node);
   }
 }

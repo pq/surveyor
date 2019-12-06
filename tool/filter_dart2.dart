@@ -17,7 +17,7 @@ import 'dart:io';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:surveyor/src/common.dart';
 
-main(List<String> args) async {
+void main(List<String> args) async {
   final dir = args[0];
 
   var count = 0;

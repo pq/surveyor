@@ -30,7 +30,7 @@ import 'package:surveyor/src/visitors.dart';
 /// Run like so:
 ///
 /// dart example/lint_surveyor.dart <source dir>
-main(List<String> args) async {
+void main(List<String> args) async {
   final stopwatch = Stopwatch()..start();
 
   if (args.length == 1) {
@@ -166,7 +166,7 @@ class _Visitor extends SimpleAstVisitor {
   _Visitor(this.rule);
 
   @override
-  visitMethodInvocation(MethodInvocation node) {
+  void visitMethodInvocation(MethodInvocation node) {
     bool isDartCore(MethodInvocation node) =>
         node.methodName.staticElement?.library?.name == 'dart.core';
 
