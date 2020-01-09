@@ -122,8 +122,7 @@ class _Visitor extends RecursiveAstVisitor
     }
 
     // ignore: omit_local_variable_types
-    ClassElement classElement =
-        member.getAncestor((element) => element is ClassElement);
+    ClassElement classElement = member.thisOrAncestorOfType<ClassElement>();
     if (classElement == null) {
       return null;
     }
@@ -140,7 +139,7 @@ class _Visitor extends RecursiveAstVisitor
   @override
   void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback}) {
-    inheritanceManager = InheritanceManager3(context.typeSystem);
+    inheritanceManager = InheritanceManager3();
   }
 
   @override

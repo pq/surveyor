@@ -5,8 +5,9 @@ environment:
   sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
+  analyzer: ^0.39.4
   surveyor:
     # todo(pq): update when surveyor gets published.
     git:
      url: https://github.com/pq/surveyor
-     ref: 8f2d8c7e41d64a97509cc9c434339d114bcc74e8
+     ref: 607416fe2216591c10331b96ffcbe8beeac18fff
