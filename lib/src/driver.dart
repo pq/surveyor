@@ -175,8 +175,7 @@ class Driver {
             continue;
           }
 
-          final typeSystem = await context.currentSession.typeSystem;
-          final surveyorContext = SurveyorContext(context, typeSystem);
+          final surveyorContext = SurveyorContext(context);
 
           preAnalyze(surveyorContext, subDir: dir != root);
 
