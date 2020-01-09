@@ -72,7 +72,7 @@ bool isInLibDir(CompilationUnit node, WorkspacePackage package) {
 }
 
 bool isInterface(InterfaceType type, String interface, String library) =>
-    type.name == interface && type.element.library.name == library;
+    type.element?.name == interface && type.element.library.name == library;
 
 /// Check if the given identifier has a private name.
 bool isPrivate(SimpleIdentifier identifier) =>

@@ -48,8 +48,8 @@ class TwoGram implements Comparable<TwoGram> {
   final String child;
 
   TwoGram(DartType parent, DartType child)
-      : parent = parent?.name ?? 'null',
-        child = child?.name ?? 'null';
+      : parent = parent?.element?.name ?? 'null',
+        child = child?.element?.name ?? 'null';
 
   @override
   int get hashCode => parent.hashCode * 13 + child.hashCode;

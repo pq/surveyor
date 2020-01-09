@@ -107,12 +107,12 @@ class ApiUseCollector extends RecursiveAstVisitor
     var location;
     final name = node.methodName.name;
     if (name == 'transform' || name == 'pipe') {
-      final type = node.realTarget?.staticType?.name;
+      final type = node.realTarget?.staticType?.element?.name;
       if (type == 'Stream') {
         location = lineInfo.getLocation(node.offset);
       }
     } else if (name == 'close') {
-      final type = node.realTarget?.staticType?.name;
+      final type = node.realTarget?.staticType?.element?.name;
       if (type == 'HttpClientRequest') {
         location = lineInfo.getLocation(node.offset);
       }
@@ -120,7 +120,7 @@ class ApiUseCollector extends RecursiveAstVisitor
 
     if (location != null) {
       print(
-          '${node.staticType.name}.$name: $filePath:${location.lineNumber}:${location.columnNumber}');
+          '${node.staticType.element?.name}.$name: $filePath:${location.lineNumber}:${location.columnNumber}');
     }
 
     super.visitMethodInvocation(node);
