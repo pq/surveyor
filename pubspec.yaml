@@ -18,9 +18,6 @@ dependencies:
   pub_semver: ^1.0.0
   tuple: ^1.0.0
 
-dependency_overrides:
-  corpus:
-    path: ../corpus
 
 dev_dependencies:
   pedantic: ^1.0.0
