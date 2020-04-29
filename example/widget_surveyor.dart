@@ -13,34 +13,161 @@
 //  limitations under the License.
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:cli_util/cli_logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
 
-/// Gathers and displays widget 2-grams.
+/// Gathers and displays widget counts and 2-grams.
 ///
 /// Run like so:
 ///
-/// dart example/widget_surveyor.dart <source dir>
+///     dart example/widget_surveyor.dart <source dir>
+///
+/// Results are output in a file `results.json`.  To get a summary
+/// of the results, pass `results.json` as the sole argument to the
+/// surveyor:
+///
+///     dart example/widget_surveyor.dart results.json
+///
 void main(List<String> args) async {
+  log.stdout('Surveying...');
   if (args.length == 1) {
+    if (args[0] == 'results.json') {
+      // Disable tracing and timestamps.
+      log = Logger.standard();
+      log.stdout('Parsing results...');
+      var results = ResultsReader().parse();
+      summarizeResults(results, log);
+      return;
+    }
     final dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
-      print("Recursing into '$dir'...");
+      log.trace("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList();
     }
   }
 
+  var collector = WidgetCollector();
+
   final driver = Driver.forArgs(args);
-  driver.visitor = WidgetCollector();
+  driver.visitor = collector;
 
   await driver.analyze();
+
+  log.stdout('Writing results.json...');
+  var results =
+      JsonEncoder.withIndent('  ').convert(collector.results.toJson());
+  File('results.json').writeAsStringSync(results);
+  log.stdout('Done');
+}
+
+Logger log = Logger.verbose();
+
+void summarizeResults(AnalysisResults results, Logger log) {
+  var projectCount = 0;
+  var skipCount = 0;
+  var totals = <String, WidgetOccurrence>{};
+  for (var result in results) {
+    var entries = result.widgetCounts.entries;
+    if (entries.isNotEmpty) {
+      ++projectCount;
+    } else {
+      ++skipCount;
+    }
+    for (var count in entries) {
+      totals.update(count.key,
+          (v) => WidgetOccurrence(v.occurrences + count.value, v.projects + 1),
+          ifAbsent: () => WidgetOccurrence(count.value, 1));
+    }
+  }
+
+  log.stdout('Total projects: $projectCount ($skipCount skipped)');
+  log.stdout('');
+
+  var sorted = totals.entries.toList()
+    ..sort((c1, c2) => c2.value.occurrences - c1.value.occurrences);
+  String padClass(String s) => s.padRight(34, ' ');
+  String padCount(String s) => s.padLeft(7, ' ');
+  String padPercent(String s) => s.padLeft(21, ' ');
+  log.stdout(
+      '| ${padClass("class - (F)lutter")} |   count | % containing projects |');
+  log.stdout(
+      '------------------------------------------------------------------------');
+
+  for (var e in sorted) {
+    var key = e.key;
+    var inFlutter = key.startsWith('package:flutter/') ? ' (F)' : '';
+    var name = '${key.split('#')[1]}$inFlutter';
+    var count = e.value;
+    var percent = (count.projects / projectCount).toStringAsFixed(2);
+    log.stdout(
+        '| ${padClass(name)} | ${padCount(count.occurrences.toString())} | ${padPercent(percent)} |');
+//    log.stdout('$key,${count.occurrences.toString()},$percent');
+  }
+  log.stdout(
+      '------------------------------------------------------------------------');
+}
+
+class AnalysisResult {
+  final String appName;
+  final Map<String, int> widgetCounts;
+
+  AnalysisResult(this.appName, this.widgetCounts);
+
+  AnalysisResult.fromJson(Map<String, dynamic> json)
+      : appName = json['name'],
+        widgetCounts = {} {
+    var map = json['widgets'];
+    for (var entry in map.entries) {
+      widgetCounts[entry.key] = entry.value as int;
+    }
+  }
+
+  Map<String, dynamic> toJson() => {'name': appName, 'widgets': widgetCounts};
+}
+
+// bug?
+// ignore: prefer_mixin
+class AnalysisResults with IterableMixin<AnalysisResult> {
+  final List<AnalysisResult> _results = [];
+
+  AnalysisResults();
+
+  AnalysisResults.fromJson(Map<String, dynamic> json) {
+    var entries = json['details'];
+    for (var entry in entries) {
+      add(AnalysisResult.fromJson(entry));
+    }
+  }
+
+  @override
+  Iterator<AnalysisResult> get iterator => _results.iterator;
+
+  void add(AnalysisResult result) {
+    _results.add(result);
+  }
+
+  Map<String, dynamic> toJson() => {
+        // Summary?
+        // ...
+        // Details.
+        'details': [for (var result in _results) result.toJson()]
+      };
+}
+
+class ResultsReader {
+  AnalysisResults parse() {
+    var json = jsonDecode(File('results.json').readAsStringSync());
+    return AnalysisResults.fromJson(json);
+  }
 }
 
 class TwoGram implements Comparable<TwoGram> {
@@ -87,66 +214,84 @@ class TwoGrams {
 
 class WidgetCollector extends RecursiveAstVisitor
     implements PreAnalysisCallback, PostAnalysisCallback {
-  final TwoGrams twoGrams = TwoGrams();
-  final Map<DartType, int> widgets = <DartType, int>{};
-  final ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
+//  final TwoGrams twoGrams = TwoGrams();
+  final Map<String, int> widgets = <String, int>{};
+//  final ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
+
+  final AnalysisResults results = AnalysisResults();
 
   String dirName;
-  WidgetCollector();
+
+  String getSignature(DartType type) {
+    var uri = type.element.library.location;
+    var name = type.element.displayName;
+    return '$uri#$name';
+  }
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands _) {
-    write2Grams();
+//    write2Grams();
     writeWidgetCounts();
+    widgets.clear();
   }
 
   @override
   void preAnalysis(SurveyorContext context,
       {bool subDir, DriverCommands commandCallback}) {
     dirName = path.basename(context.analysisContext.contextRoot.root.path);
-    print("Analyzing '$dirName'...");
+    log.stdout("Analyzing '$dirName'...");
   }
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final type = node.staticType;
     if (isWidgetType(type)) {
-      widgets.update(type, (v) => v + 1, ifAbsent: () => 1);
+      var signature = getSignature(type);
+      widgets.update(signature, (v) => v + 1, ifAbsent: () => 1);
 
-      final parent =
-          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
-
-      twoGrams.add(TwoGram(parent, type));
-
-      enclosingWidgets.addFirst(type);
-
-      // Visit children.
-      super.visitInstanceCreationExpression(node);
-
-      // Reset parent.
-      enclosingWidgets.removeFirst();
+//      final parent =
+//          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
+//
+//      twoGrams.add(TwoGram(parent, type));
+//
+//      enclosingWidgets.addFirst(type);
+//
+//      // Visit children.
+//      super.visitInstanceCreationExpression(node);
+//
+//      // Reset parent.
+//      enclosingWidgets.removeFirst();
     } else {
       super.visitInstanceCreationExpression(node);
     }
   }
 
-  void write2Grams() {
-    final fileName = '${dirName}_2gram.csv';
-    print("Writing 2-Grams to '${path.basename(fileName)}'...");
-    File(fileName).writeAsStringSync(twoGrams.toString());
-  }
+//  void write2Grams() {
+//    final fileName = '${dirName}_2gram.csv';
+//    log.trace("Writing 2-Grams to '${path.basename(fileName)}'...");
+//    //File(fileName).writeAsStringSync(twoGrams.toString());
+//  }
 
   void writeWidgetCounts() {
-    final fileName = '${dirName}_widget.csv';
-    print("Writing Widget counts to '${path.basename(fileName)}'...");
-    final sb = StringBuffer();
-    for (var entry in widgets.entries) {
-      final type = entry.key;
-      final isFlutterWidget = type.element.library.location.components[0]
-          .startsWith('package:flutter/');
-      final widgetType = isFlutterWidget ? 'flutter' : '*';
-      sb.write('$type, ${entry.value}, $widgetType\n');
-    }
-    File(fileName).writeAsStringSync(sb.toString());
+//    final fileName = '${dirName}_widget.csv';
+//    log.trace("Writing Widget counts to '${path.basename(fileName)}'...");
+//    final sb = StringBuffer();
+//    for (var entry in widgets.entries) {
+//      final typeUri = entry.key;
+//      final isFlutterWidget = typeUri.startsWith('package:flutter/');
+//      final widgetType = isFlutterWidget ? 'flutter' : '*';
+//      sb.writeln('$typeUri, ${entry.value}, $widgetType');
+//    }
+//    //TMP
+//    print(sb.toString());
+//    //File(fileName).writeAsStringSync(sb.toString());
+
+    results.add(AnalysisResult(dirName, Map.from(widgets)));
   }
+}
+
+class WidgetOccurrence {
+  int occurrences;
+  int projects;
+  WidgetOccurrence(this.occurrences, this.projects);
 }
