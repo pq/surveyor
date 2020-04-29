@@ -234,6 +234,7 @@ class Driver {
   /// Display the following [msg] to stdout iff [silent] is false.
   void _print(String msg) {
     if (!silent) {
+      // todo (pq): replace w/ a Logger instance.
       print(msg);
     }
   }
