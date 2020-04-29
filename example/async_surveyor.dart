@@ -140,8 +140,7 @@ class AsyncCollector extends RecursiveAstVisitor
           .add(currentFolder.path.split('/').last.split('-').first);
 
       var location = lineInfo.getLocation(node.offset);
-      var report =
-          '$filePath:${location.lineNumber}:${location.columnNumber}';
+      var report = '$filePath:${location.lineNumber}:${location.columnNumber}';
       reports.add(report);
       var declDetail = node.inDeclarationContext() ? '(decl) ' : '';
       print("found '$id' $declDetail• $report");

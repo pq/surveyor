@@ -205,8 +205,7 @@ class TwoGrams {
   @override
   String toString() {
     var sb = StringBuffer();
-    var entries = map.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
+    var entries = map.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
     for (var entry in entries) {
       sb.writeln('${entry.key}, ${entry.value}');
     }
