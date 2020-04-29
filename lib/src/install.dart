@@ -24,7 +24,7 @@ class Package {
   Package(String path) : dir = Directory(path);
 
   Map<String, dynamic> get dependencies {
-    final deps = pubspec['dependencies']?.value;
+    var deps = pubspec['dependencies']?.value;
     if (deps is yaml.YamlMap) {
       return deps.nodes
           .map((k, v) => MapEntry<String, dynamic>(k.toString(), v));
@@ -35,7 +35,7 @@ class Package {
   File get packagesFile => File(pathutil.join(dir.path, '.packages'));
 
   Map<dynamic, yaml.YamlNode> get pubspec {
-    final file = pubspecFile;
+    var file = pubspecFile;
     if (file.existsSync()) {
       try {
         return (yaml.loadYaml(file.readAsStringSync()) as yaml.YamlMap).nodes;
@@ -65,7 +65,7 @@ class _Installer {
 
   Future<ProcessResult> installDependencies(Package package,
       {bool silent = false}) async {
-    final sourcePath = package.dir.path;
+    var sourcePath = package.dir.path;
     if (!package.dir.existsSync()) {
       _print(
           'Unable to install dependencies: $sourcePath does not exist', silent);

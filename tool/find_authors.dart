@@ -118,8 +118,8 @@ void main(List<String> args) async {
   ];
 
   for (var p in packages) {
-    final json = jsonDecode(await getBody('https://pub.dev/api/packages/$p'));
-    final details = hasDartAuthor(json)
+    var json = jsonDecode(await getBody('https://pub.dev/api/packages/$p'));
+    var details = hasDartAuthor(json)
         ? ' (Dart)'
         : hasFlutterAuthor(json) ? ' (Flutter)' : '';
     print('$p$details');
@@ -127,13 +127,13 @@ void main(List<String> args) async {
 }
 
 bool hasDartAuthor(json) {
-  final latest = json['latest'];
-  final String author = latest['pubspec']['author'];
+  var latest = json['latest'];
+  var author = latest['pubspec']['author'];
   return author?.contains('Dart Team') == true;
 }
 
 bool hasFlutterAuthor(json) {
-  final latest = json['latest'];
-  final String author = latest['pubspec']['author'];
+  var latest = json['latest'];
+  var author = latest['pubspec']['author'];
   return author?.contains('Flutter Team') == true;
 }

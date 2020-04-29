@@ -18,7 +18,7 @@ import 'package:args/args.dart';
 import 'package:http/http.dart' as http;
 import 'package:yaml/yaml.dart';
 
-final _client = http.Client();
+var _client = http.Client();
 
 Future<String> getBody(String url) async => (await getResponse(url)).body;
 
@@ -68,7 +68,7 @@ YamlMap _readYamlFromString(String optionsSource) {
     return YamlMap();
   }
   try {
-    final doc = loadYamlNode(optionsSource);
+    var doc = loadYamlNode(optionsSource);
     if (doc is YamlMap) {
       return doc;
     }
@@ -81,7 +81,7 @@ YamlMap _readYamlFromString(String optionsSource) {
 }
 
 class AnalysisOptionsFile {
-  final File file;
+  File file;
 
   String _contents;
 
@@ -96,16 +96,16 @@ class AnalysisOptionsFile {
 
 class CommandLineOptions {
   /// Emit output in a verbose mode.
-  final bool verbose;
+  bool verbose;
 
   /// Use ANSI color codes for output.
-  final bool color;
+  bool color;
 
   /// Force installation of package dependencies.
-  final bool forceInstall;
+  bool forceInstall;
 
   /// Skip package dependency install checks.
-  final bool skipInstall;
+  bool skipInstall;
 
   CommandLineOptions({
     this.verbose = false,
@@ -124,7 +124,7 @@ class CommandLineOptions {
 }
 
 class PubspecFile {
-  final File file;
+  File file;
 
   String _contents;
 

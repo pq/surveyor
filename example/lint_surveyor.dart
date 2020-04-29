@@ -31,10 +31,10 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// dart example/lint_surveyor.dart <source dir>
 void main(List<String> args) async {
-  final stopwatch = Stopwatch()..start();
+  var stopwatch = Stopwatch()..start();
 
   if (args.length == 1) {
-    final dir = args[0];
+    var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       print("Recursing into '$dir'...");
 
@@ -54,7 +54,7 @@ void main(List<String> args) async {
     print('Limiting analysis to $_debuglimit packages.');
   }
 
-  final driver = Driver.forArgs(args);
+  var driver = Driver.forArgs(args);
   driver.visitor = AnalysisAdvisor();
   driver.showErrors = true;
 
@@ -108,7 +108,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
     if (subDir) {
       ++dirCount;
     }
-    final root = context.analysisContext.contextRoot.root;
+    var root = context.analysisContext.contextRoot.root;
     var dirName = path.basename(root.path);
     if (subDir) {
       // Qualify.
@@ -119,7 +119,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
 
   @override
   void reportError(AnalysisResultWithErrors result) {
-    final errors = result.errors.where(showError).toList();
+    var errors = result.errors.where(showError).toList();
     if (errors.isEmpty) {
       return;
     }
@@ -155,7 +155,7 @@ void f(int x) {
   @override
   void registerNodeProcessors(NodeLintRegistry registry,
       [LinterContext context]) {
-    final visitor = _Visitor(this);
+    var visitor = _Visitor(this);
     registry.addMethodInvocation(this, visitor);
   }
 }

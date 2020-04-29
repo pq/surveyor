@@ -48,6 +48,7 @@ linter:
      - test_types_in_equals
      - throw_in_finally
      - unnecessary_brace_in_string_interps
+     - unnecessary_final
      - unnecessary_getters_setters
      - unnecessary_lambdas
      - unnecessary_overrides

@@ -33,9 +33,9 @@ final Map<String, int> _severityCompare = {
 };
 
 WorkspacePackage getPackage(CompilationUnit unit) {
-  final element = unit.declaredElement;
-  final libraryPath = element.library.source.source.fullName;
-  final workspace = element.session?.analysisContext?.workspace;
+  var element = unit.declaredElement;
+  var libraryPath = element.library.source.source.fullName;
+  var workspace = element.session?.analysisContext?.workspace;
   return workspace?.findPackageFor(libraryPath);
 }
 
@@ -52,7 +52,7 @@ bool implementsInterface(DartType type, String interface, String library) {
 /// Returns `true` if this [node] is the child of a private compilation unit
 /// member.
 bool inPrivateMember(AstNode node) {
-  final parent = node.parent;
+  var parent = node.parent;
   if (parent is NamedCompilationUnitMember) {
     return isPrivate(parent.name);
   }
@@ -65,9 +65,9 @@ bool inPrivateMember(AstNode node) {
 /// Return true if this compilation unit [node] is declared within the given
 /// [package]'s `lib/` directory tree.
 bool isInLibDir(CompilationUnit node, WorkspacePackage package) {
-  final cuPath = node.declaredElement.library?.source?.fullName;
+  var cuPath = node.declaredElement.library?.source?.fullName;
   if (cuPath == null) return false;
-  final libDir = path.join(package.root, 'lib');
+  var libDir = path.join(package.root, 'lib');
   return path.isWithin(libDir, cuPath);
 }
 
@@ -112,10 +112,10 @@ class AnalysisStats {
   /// Print statistics to [out].
   void print([StringSink out]) {
     out ??= io.stdout;
-    final hasErrors = errorCount != 0;
-    final hasWarns = warnCount != 0;
-    final hasHints = hintCount != 0;
-    final hasLints = lintCount != 0;
+    var hasErrors = errorCount != 0;
+    var hasWarns = warnCount != 0;
+    var hasHints = hintCount != 0;
+    var hasLints = lintCount != 0;
     var hasContent = false;
     if (hasErrors) {
       out.write(errorCount);
@@ -163,7 +163,7 @@ class AnalysisStats {
 }
 
 class AnsiLogger {
-  final bool useAnsi;
+  bool useAnsi;
 
   AnsiLogger(this.useAnsi);
   String get blue => _code('\u001b[34m');
@@ -185,14 +185,14 @@ class AnsiLogger {
 
 /// An [AnalysisError] with line and column information.
 class CLIError implements Comparable<CLIError> {
-  final String severity;
-  final String sourcePath;
-  final int offset;
-  final int line;
-  final int column;
-  final String message;
-  final String errorCode;
-  final String correction;
+  String severity;
+  String sourcePath;
+  int offset;
+  int line;
+  int column;
+  String message;
+  String errorCode;
+  String correction;
 
   CLIError({
     this.severity,
@@ -245,8 +245,8 @@ class CLIError implements Comparable<CLIError> {
 /// The two format options are a user consumable format and a machine consumable
 /// format.
 abstract class ErrorFormatter {
-  final StringSink out;
-  final AnalysisStats stats;
+  StringSink out;
+  AnalysisStats stats;
   SeverityProcessor _severityProcessor;
 
   ErrorFormatter(this.out, this.stats, {SeverityProcessor severityProcessor}) {
@@ -262,8 +262,8 @@ abstract class ErrorFormatter {
   void formatErrors(List<AnalysisErrorInfo> errorInfos) {
     stats.unfilteredCount += errorInfos.length;
 
-    final errors = <AnalysisError>[];
-    final errorToLine = <AnalysisError, LineInfo>{};
+    var errors = <AnalysisError>[];
+    var errorToLine = <AnalysisError, LineInfo>{};
     for (var errorInfo in errorInfos) {
       for (var error in errorInfo.errors) {
         if (_computeSeverity(error) != null) {
@@ -289,7 +289,7 @@ class HumanErrorFormatter extends ErrorFormatter {
   bool displayCorrections;
 
   // This is a Set in order to de-dup CLI errors.
-  final Set<CLIError> batchedErrors = {};
+  Set<CLIError> batchedErrors = {};
 
   HumanErrorFormatter(StringSink out, AnalysisStats stats,
       {SeverityProcessor severityProcessor,
@@ -302,7 +302,7 @@ class HumanErrorFormatter extends ErrorFormatter {
   @override
   void flush() {
     // sort
-    final sortedErrors = batchedErrors.toList()..sort();
+    var sortedErrors = batchedErrors.toList()..sort();
 
     // print
     for (var error in sortedErrors) {
@@ -317,7 +317,7 @@ class HumanErrorFormatter extends ErrorFormatter {
       }
 
       // warning • 'foo' is not a bar at lib/foo.dart:1:2 • foo_warning
-      final issueColor = (error.isError || error.isWarning) ? ansi.red : '';
+      var issueColor = (error.isError || error.isWarning) ? ansi.red : '';
       out.write('  $issueColor${error.severity}${ansi.none} '
           '${ansi.bullet} ${ansi.bold}${error.message}${ansi.none} ');
       out.write('at ${error.sourcePath}');
@@ -338,10 +338,10 @@ class HumanErrorFormatter extends ErrorFormatter {
   @override
   void formatError(
       Map<AnalysisError, LineInfo> errorToLine, AnalysisError error) {
-    final source = error.source;
+    var source = error.source;
     var location = errorToLine[error].getLocation(error.offset);
 
-    final severity = _severityProcessor(error);
+    var severity = _severityProcessor(error);
 
     // Get display name; translate INFOs into LINTS and HINTS.
     var errorType = severity.displayName;

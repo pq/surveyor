@@ -16,11 +16,11 @@ import 'dart:io';
 
 /// Find and delete duplicate packages in a directory.
 void main(List<String> args) async {
-  final dir = args[0];
+  var dir = args[0];
 
-  final seen = <String, String>{};
+  var seen = <String, String>{};
 
-  final packages = Directory(dir).listSync().map((f) => f.path).toList()
+  var packages = Directory(dir).listSync().map((f) => f.path).toList()
     ..sort();
   for (var package in packages) {
     // cache/flutter_util-0.0.1 => flutter_util

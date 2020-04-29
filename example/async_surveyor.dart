@@ -30,7 +30,7 @@ import 'package:surveyor/src/visitors.dart';
 /// dart example/async_surveyor.dart <source dir>
 void main(List<String> args) async {
   if (args.length == 1) {
-    final dir = args[0];
+    var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       print("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList()..sort();
@@ -43,7 +43,7 @@ void main(List<String> args) async {
     print('Limiting analysis to $_debuglimit packages.');
   }
 
-  final driver = Driver.forArgs(args);
+  var driver = Driver.forArgs(args);
   driver.forceSkipInstall = true;
   driver.showErrors = false;
   driver.resolveUnits = false;
@@ -88,7 +88,7 @@ class AsyncCollector extends RecursiveAstVisitor
     reports.forEach(print);
 
     for (var o in occurrences.entries) {
-      final data = o.value;
+      var data = o.value;
       print('${o.key}: [${data.decls} decl, ${data.notDecls} ref]');
       data.packages.forEach(print);
     }
@@ -106,9 +106,9 @@ class AsyncCollector extends RecursiveAstVisitor
     if (subDir) {
       ++dirCount;
     }
-    final contextRoot = context.analysisContext.contextRoot;
+    var contextRoot = context.analysisContext.contextRoot;
     currentFolder = contextRoot.root;
-    final dirName = path.basename(contextRoot.root.path);
+    var dirName = path.basename(contextRoot.root.path);
 
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
@@ -125,7 +125,7 @@ class AsyncCollector extends RecursiveAstVisitor
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final id = node.name;
+    var id = node.name;
 
     if (occurrences.containsKey(id)) {
       var occurrence = occurrences[id];
@@ -139,11 +139,11 @@ class AsyncCollector extends RecursiveAstVisitor
       occurrence.packages
           .add(currentFolder.path.split('/').last.split('-').first);
 
-      final location = lineInfo.getLocation(node.offset);
-      final report =
+      var location = lineInfo.getLocation(node.offset);
+      var report =
           '$filePath:${location.lineNumber}:${location.columnNumber}';
       reports.add(report);
-      final declDetail = node.inDeclarationContext() ? '(decl) ' : '';
+      var declDetail = node.inDeclarationContext() ? '(decl) ' : '';
       print("found '$id' $declDetail• $report");
       contextRoots.add(currentFolder);
       print(occurrences);

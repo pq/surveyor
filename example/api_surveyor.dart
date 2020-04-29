@@ -29,7 +29,7 @@ import 'package:surveyor/src/visitors.dart';
 /// dart example/api_surveyor.dart <source dir>
 void main(List<String> args) async {
   if (args.length == 1) {
-    final dir = args[0];
+    var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       print("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList()..sort();
@@ -42,9 +42,9 @@ void main(List<String> args) async {
     print('Limiting analysis to $_debuglimit packages.');
   }
 
-  final stopwatch = Stopwatch()..start();
+  var stopwatch = Stopwatch()..start();
 
-  final driver = Driver.forArgs(args);
+  var driver = Driver.forArgs(args);
   driver.forceSkipInstall = true;
   driver.showErrors = false;
   driver.resolveUnits = true;
@@ -85,9 +85,9 @@ class ApiUseCollector extends RecursiveAstVisitor
     if (subDir) {
       ++dirCount;
     }
-    final contextRoot = context.analysisContext.contextRoot;
+    var contextRoot = context.analysisContext.contextRoot;
     currentFolder = contextRoot.root;
-    final dirName = path.basename(contextRoot.root.path);
+    var dirName = path.basename(contextRoot.root.path);
 
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
@@ -105,14 +105,14 @@ class ApiUseCollector extends RecursiveAstVisitor
   @override
   void visitMethodInvocation(MethodInvocation node) {
     var location;
-    final name = node.methodName.name;
+    var name = node.methodName.name;
     if (name == 'transform' || name == 'pipe') {
-      final type = node.realTarget?.staticType?.element?.name;
+      var type = node.realTarget?.staticType?.element?.name;
       if (type == 'Stream') {
         location = lineInfo.getLocation(node.offset);
       }
     } else if (name == 'close') {
-      final type = node.realTarget?.staticType?.element?.name;
+      var type = node.realTarget?.staticType?.element?.name;
       if (type == 'HttpClientRequest') {
         location = lineInfo.getLocation(node.offset);
       }

@@ -32,10 +32,10 @@ import 'package:surveyor/src/visitors.dart';
 ///     dart example/widget_surveyor.dart <source dir>
 ///
 /// Results are output in a file `results.json`.  To get a summary
-/// of the results, pass `results.json` as the sole argument to the
-/// surveyor:
+/// of the results, pass `results.json` and optionally a corpus `index.json` as
+/// sole arguments to the surveyor:
 ///
-///     dart example/widget_surveyor.dart results.json
+///     dart example/widget_surveyor.dart results.json [index.json]
 ///
 void main(List<String> args) async {
   log.stdout('Surveying...');
@@ -45,10 +45,12 @@ void main(List<String> args) async {
       log = Logger.standard();
       log.stdout('Parsing results...');
       var results = ResultsReader().parse();
+//      here: optionally read in corpus
+
       summarizeResults(results, log);
       return;
     }
-    final dir = args[0];
+    var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       log.trace("Recursing into '$dir'...");
       args = Directory(dir).listSync().map((f) => f.path).toList();
@@ -57,7 +59,7 @@ void main(List<String> args) async {
 
   var collector = WidgetCollector();
 
-  final driver = Driver.forArgs(args);
+  var driver = Driver.forArgs(args);
   driver.visitor = collector;
 
   await driver.analyze();
@@ -202,8 +204,8 @@ class TwoGrams {
 
   @override
   String toString() {
-    final sb = StringBuffer();
-    final entries = map.entries.toList()
+    var sb = StringBuffer();
+    var entries = map.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
     for (var entry in entries) {
       sb.writeln('${entry.key}, ${entry.value}');
@@ -214,9 +216,9 @@ class TwoGrams {
 
 class WidgetCollector extends RecursiveAstVisitor
     implements PreAnalysisCallback, PostAnalysisCallback {
-//  final TwoGrams twoGrams = TwoGrams();
+//  var TwoGrams twoGrams = TwoGrams();
   final Map<String, int> widgets = <String, int>{};
-//  final ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
+//  var ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
 
   final AnalysisResults results = AnalysisResults();
 
@@ -244,12 +246,12 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final type = node.staticType;
+    var type = node.staticType;
     if (isWidgetType(type)) {
       var signature = getSignature(type);
       widgets.update(signature, (v) => v + 1, ifAbsent: () => 1);
 
-//      final parent =
+//      var parent =
 //          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
 //
 //      twoGrams.add(TwoGram(parent, type));
@@ -267,19 +269,19 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
 //  void write2Grams() {
-//    final fileName = '${dirName}_2gram.csv';
+//    var fileName = '${dirName}_2gram.csv';
 //    log.trace("Writing 2-Grams to '${path.basename(fileName)}'...");
 //    //File(fileName).writeAsStringSync(twoGrams.toString());
 //  }
 
   void writeWidgetCounts() {
-//    final fileName = '${dirName}_widget.csv';
+//    var fileName = '${dirName}_widget.csv';
 //    log.trace("Writing Widget counts to '${path.basename(fileName)}'...");
-//    final sb = StringBuffer();
+//    var sb = StringBuffer();
 //    for (var entry in widgets.entries) {
-//      final typeUri = entry.key;
-//      final isFlutterWidget = typeUri.startsWith('package:flutter/');
-//      final widgetType = isFlutterWidget ? 'flutter' : '*';
+//      var typeUri = entry.key;
+//      var isFlutterWidget = typeUri.startsWith('package:flutter/');
+//      var widgetType = isFlutterWidget ? 'flutter' : '*';
 //      sb.writeln('$typeUri, ${entry.value}, $widgetType');
 //    }
 //    //TMP

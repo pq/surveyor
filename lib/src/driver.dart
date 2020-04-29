@@ -33,7 +33,7 @@ import 'install.dart';
 import 'visitors.dart';
 
 class Driver {
-  final CommandLineOptions options;
+  CommandLineOptions options;
 
   /// Hook to contribute a custom AST visitor.
   AstVisitor visitor;
@@ -50,7 +50,7 @@ class Driver {
 
   bool resolveUnits = true;
 
-  final List<String> sources;
+  List<String> sources;
 
   List<Linter> _lints;
 
@@ -141,11 +141,11 @@ class Driver {
     // Analyze.
     _print('Analyzing...');
 
-    final cmd = DriverCommands();
+    var cmd = DriverCommands();
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
-        final collection = AnalysisContextCollection(
+        var collection = AnalysisContextCollection(
           includedPaths: [root],
           excludedPaths: excludedPaths.map((p) => path.join(root, p)).toList(),
           resourceProvider: resourceProvider,
@@ -154,15 +154,15 @@ class Driver {
         for (var context in collection.contexts) {
           // Add custom lints.
           if (lints != null) {
-            final options = context.analysisOptions as AnalysisOptionsImpl;
+            var options = context.analysisOptions as AnalysisOptionsImpl;
             options.lintRules = context.analysisOptions.lintRules.toList();
             for (var lint in lints) {
               options.lintRules.add(lint);
             }
             options.lint = true;
           }
-          final dir = context.contextRoot.root.path;
-          final package = Package(dir);
+          var dir = context.contextRoot.root.path;
+          var package = Package(dir);
           // Ensure dependencies are installed.
           if (!skipPackageInstall) {
             await package.installDependencies(
@@ -175,14 +175,14 @@ class Driver {
             continue;
           }
 
-          final surveyorContext = SurveyorContext(context);
+          var surveyorContext = SurveyorContext(context);
 
           preAnalyze(surveyorContext, subDir: dir != root);
 
           for (var filePath in context.contextRoot.analyzedFiles()) {
             if (AnalysisEngine.isDartFileName(filePath)) {
               try {
-                final result = resolveUnits
+                var result = resolveUnits
                     ? await context.currentSession.getResolvedUnit(filePath)
                     : context.currentSession.getParsedUnit(filePath);
 
@@ -191,7 +191,7 @@ class Driver {
                     (visitor as ErrorReporter).reportError(result);
                   }
                   if (visitor is AstContext) {
-                    final astContext = visitor as AstContext;
+                    var astContext = visitor as AstContext;
                     astContext.setLineInfo(result.lineInfo);
                     astContext.setFilePath(filePath);
                   }
