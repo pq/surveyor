@@ -76,7 +76,7 @@ bool isInterface(InterfaceType type, String interface, String library) =>
 
 /// Check if the given identifier has a private name.
 bool isPrivate(SimpleIdentifier identifier) =>
-    identifier != null ? Identifier.isPrivateName(identifier.name) : false;
+    identifier != null && Identifier.isPrivateName(identifier.name);
 
 bool isWidgetType(DartType type) => implementsInterface(type, 'Widget', '');
 
