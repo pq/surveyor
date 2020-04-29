@@ -11,11 +11,12 @@ linter:
    rules:
      - always_require_non_null_named_parameters
      - annotate_overrides
-#     - avoid_bool_literals_in_conditional_expressions # todo(pq): enable
+     - avoid_bool_literals_in_conditional_expressions
      - avoid_function_literals_in_foreach_calls
      - avoid_null_checks_in_equality_operators
 #     - avoid_print # ensure all calls are rationalized (and silence-able)
      - avoid_private_typedef_functions
+     - avoid_redundant_argument_values
      - avoid_returning_null_for_future
      - await_only_futures
      - camel_case_types
