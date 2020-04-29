@@ -24,7 +24,7 @@ import 'src/doc_surveyor.dart';
 /// Score: 0.98
 ///
 void main(List<String> args) async {
-  final stats = await analyzeDocs(args[0], silent: true);
+  final stats = await analyzeDocs(args[0]);
   print('${stats.publicMemberCount} public members');
   print('Members without docs:');
   final locations = stats.undocumentedMemberLocations;
