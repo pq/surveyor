@@ -30,18 +30,18 @@ import 'package:surveyor/src/driver.dart';
 import 'package:surveyor/src/visitors.dart';
 
 Future<DocStats> analyzeDocs(String packageFolder, {bool silent = true}) async {
-  final pubspec = path.join(packageFolder, 'pubspec.yaml');
+  var pubspec = path.join(packageFolder, 'pubspec.yaml');
   if (!File(pubspec).existsSync()) {
     throw Exception('File not found: $pubspec');
   }
 
-  final driver = Driver.forArgs([packageFolder]);
+  var driver = Driver.forArgs([packageFolder]);
   driver.forceSkipInstall = false;
   driver.excludedPaths = ['example', 'test'];
   driver.showErrors = true;
   driver.resolveUnits = true;
   driver.silent = silent;
-  final visitor = _Visitor();
+  var visitor = _Visitor();
   driver.visitor = visitor;
 
   await driver.analyze();
@@ -103,7 +103,7 @@ class _Visitor extends RecursiveAstVisitor
     stats.publicMemberCount++;
 
     if (node.documentationComment == null && !isOverridingMember(node)) {
-      final location = lineInfo.getLocation(node.offset);
+      var location = lineInfo.getLocation(node.offset);
       if (location != null) {
         stats.undocumentedMemberLocations.add(SourceLocation(
             node.declaredElement.displayName,
@@ -126,7 +126,7 @@ class _Visitor extends RecursiveAstVisitor
     if (classElement == null) {
       return null;
     }
-    final libraryUri = classElement.library.source.uri;
+    var libraryUri = classElement.library.source.uri;
     return inheritanceManager.getInherited(
       classElement.thisType,
       Name(libraryUri, member.name),
@@ -161,11 +161,11 @@ class _Visitor extends RecursiveAstVisitor
     check(node);
 
     // Check methods
-    final getters = <String, MethodDeclaration>{};
-    final setters = <MethodDeclaration>[];
+    var getters = <String, MethodDeclaration>{};
+    var setters = <MethodDeclaration>[];
 
     // Non-getters/setters.
-    final methods = <MethodDeclaration>[];
+    var methods = <MethodDeclaration>[];
 
     // Identify getter/setter pairs.
     for (var member in node.members) {
@@ -181,7 +181,7 @@ class _Visitor extends RecursiveAstVisitor
     }
 
     // Check all getters, and collect offenders along the way.
-    final missingDocs = <MethodDeclaration>{};
+    var missingDocs = <MethodDeclaration>{};
     for (var getter in getters.values) {
       if (check(getter)) {
         missingDocs.add(getter);
@@ -190,11 +190,11 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      final getter = getters[setter.name.name];
+      var getter = getters[setter.name.name];
       if (getter == null) {
-        final libraryUri = node.declaredElement.library.source.uri;
+        var libraryUri = node.declaredElement.library.source.uri;
         // Look for an inherited getter.
-        final getter = inheritanceManager.getMember(
+        var getter = inheritanceManager.getMember(
           node.declaredElement.thisType,
           Name(libraryUri, setter.name.name),
         );
@@ -227,25 +227,25 @@ class _Visitor extends RecursiveAstVisitor
     // Clear cached API elements.
     apiElements = <Element>{};
 
-    final package = getPackage(node);
+    var package = getPackage(node);
     // Ignore this compilation unit if it's not in the lib/ folder.
     isInLibFolder = isInLibDir(node, package);
     if (!isInLibFolder) return;
 
-    final library = node.declaredElement.library;
-    final namespaceBuilder = NamespaceBuilder();
-    final exports = namespaceBuilder.createExportNamespaceForLibrary(library);
-    final public = namespaceBuilder.createPublicNamespaceForLibrary(library);
+    var library = node.declaredElement.library;
+    var namespaceBuilder = NamespaceBuilder();
+    var exports = namespaceBuilder.createExportNamespaceForLibrary(library);
+    var public = namespaceBuilder.createPublicNamespaceForLibrary(library);
     apiElements.addAll(exports.definedNames.values);
     apiElements.addAll(public.definedNames.values);
 
-    final getters = <String, FunctionDeclaration>{};
-    final setters = <FunctionDeclaration>[];
+    var getters = <String, FunctionDeclaration>{};
+    var setters = <FunctionDeclaration>[];
 
     // Check functions.
 
     // Non-getters/setters.
-    final functions = <FunctionDeclaration>[];
+    var functions = <FunctionDeclaration>[];
 
     // Identify getter/setter pairs.
     for (var member in node.declarations) {
@@ -264,7 +264,7 @@ class _Visitor extends RecursiveAstVisitor
     }
 
     // Check all getters, and collect offenders along the way.
-    final missingDocs = <FunctionDeclaration>{};
+    var missingDocs = <FunctionDeclaration>{};
     for (var getter in getters.values) {
       if (check(getter)) {
         missingDocs.add(getter);
@@ -273,7 +273,7 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      final getter = getters[setter.name.name];
+      var getter = getters[setter.name.name];
       if (getter != null && missingDocs.contains(getter)) {
         check(setter);
       }
@@ -324,11 +324,11 @@ class _Visitor extends RecursiveAstVisitor
 
     // Check methods
 
-    final getters = <String, MethodDeclaration>{};
-    final setters = <MethodDeclaration>[];
+    var getters = <String, MethodDeclaration>{};
+    var setters = <MethodDeclaration>[];
 
     // Non-getters/setters.
-    final methods = <MethodDeclaration>[];
+    var methods = <MethodDeclaration>[];
 
     // Identify getter/setter pairs.
     for (var member in node.members) {
@@ -344,7 +344,7 @@ class _Visitor extends RecursiveAstVisitor
     }
 
     // Check all getters, and collect offenders along the way.
-    final missingDocs = <MethodDeclaration>{};
+    var missingDocs = <MethodDeclaration>{};
     for (var getter in getters.values) {
       if (check(getter)) {
         missingDocs.add(getter);
@@ -353,7 +353,7 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      final getter = getters[setter.name.name];
+      var getter = getters[setter.name.name];
       if (getter != null && missingDocs.contains(getter)) {
         check(setter);
       }

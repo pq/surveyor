@@ -24,15 +24,15 @@ import 'src/doc_surveyor.dart';
 /// Score: 0.98
 ///
 void main(List<String> args) async {
-  final stats = await analyzeDocs(args[0]);
+  var stats = await analyzeDocs(args[0]);
   print('${stats.publicMemberCount} public members');
   print('Members without docs:');
-  final locations = stats.undocumentedMemberLocations;
+  var locations = stats.undocumentedMemberLocations;
   for (var location in locations) {
     print(location.asString());
   }
 
-  final score =
+  var score =
       ((stats.publicMemberCount - locations.length) / stats.publicMemberCount)
           .toStringAsFixed(2);
   print('Score: $score');
