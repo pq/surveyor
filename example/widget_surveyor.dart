@@ -87,7 +87,8 @@ IndexFile checkForIndexFile(List<String> args) {
 
 Logger log = Logger.verbose();
 
-void summarizeResults(AnalysisResults results, IndexFile indexFile, Logger log) {
+void summarizeResults(
+    AnalysisResults results, IndexFile indexFile, Logger log) {
   var projectCount = 0;
   var skipCount = 0;
   var totals = <String, WidgetOccurrence>{};

@@ -20,8 +20,7 @@ void main(List<String> args) async {
 
   var seen = <String, String>{};
 
-  var packages = Directory(dir).listSync().map((f) => f.path).toList()
-    ..sort();
+  var packages = Directory(dir).listSync().map((f) => f.path).toList()..sort();
   for (var package in packages) {
     // cache/flutter_util-0.0.1 => flutter_util
     var name = package.split('/').last.split('-').first;
