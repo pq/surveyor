@@ -10,8 +10,8 @@ dependencies:
   analyzer: ^0.39.1
   cli_util: ^0.1.3
   corpus:
-  # update when published
-  git: git://github.com/pq/corpus.git
+    # update when published
+    git: git://github.com/pq/corpus.git
   http: ^0.12.0
   # required by example/lint_surveyor
   # linter:  ^0.1.100
