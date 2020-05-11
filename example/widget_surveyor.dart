@@ -20,6 +20,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:cli_util/cli_logging.dart';
+import 'package:corpus/corpus.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
 import 'package:surveyor/src/driver.dart';
@@ -39,17 +40,20 @@ import 'package:surveyor/src/visitors.dart';
 ///
 void main(List<String> args) async {
   log.stdout('Surveying...');
-  if (args.length == 1) {
+
+  if (args.isNotEmpty) {
     if (args[0] == 'results.json') {
       // Disable tracing and timestamps.
       log = Logger.standard();
       log.stdout('Parsing results...');
       var results = ResultsReader().parse();
-//      here: optionally read in corpus
-
-      summarizeResults(results, log);
+      var indexFile = checkForIndexFile(args);
+      summarizeResults(results, indexFile, log);
       return;
     }
+  }
+
+  if (args.length == 1) {
     var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
       log.trace("Recursing into '$dir'...");
@@ -71,9 +75,19 @@ void main(List<String> args) async {
   log.stdout('Done');
 }
 
+IndexFile checkForIndexFile(List<String> args) {
+  if (args.length == 2) {
+    var filePath = args[1];
+    if (path.basename(filePath) == 'index.json') {
+      return IndexFile(filePath)..readSync();
+    }
+  }
+  return null;
+}
+
 Logger log = Logger.verbose();
 
-void summarizeResults(AnalysisResults results, Logger log) {
+void summarizeResults(AnalysisResults results, IndexFile indexFile, Logger log) {
   var projectCount = 0;
   var skipCount = 0;
   var totals = <String, WidgetOccurrence>{};
