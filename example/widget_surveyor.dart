@@ -39,7 +39,6 @@ import 'package:surveyor/src/visitors.dart';
 ///     dart example/widget_surveyor.dart results.json [index.json]
 ///
 void main(List<String> args) async {
-
   var log = Logger.verbose();
   log.stdout('Surveying...');
 
