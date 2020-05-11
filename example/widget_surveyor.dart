@@ -39,6 +39,8 @@ import 'package:surveyor/src/visitors.dart';
 ///     dart example/widget_surveyor.dart results.json [index.json]
 ///
 void main(List<String> args) async {
+
+  var log = Logger.verbose();
   log.stdout('Surveying...');
 
   if (args.isNotEmpty) {
@@ -61,7 +63,7 @@ void main(List<String> args) async {
     }
   }
 
-  var collector = WidgetCollector();
+  var collector = WidgetCollector(log);
 
   var driver = Driver.forArgs(args);
   driver.visitor = collector;
@@ -84,8 +86,6 @@ IndexFile checkForIndexFile(List<String> args) {
   }
   return null;
 }
-
-Logger log = Logger.verbose();
 
 void summarizeResults(
     AnalysisResults results, IndexFile indexFile, Logger log) {
@@ -234,9 +234,12 @@ class WidgetCollector extends RecursiveAstVisitor
   final Map<String, int> widgets = <String, int>{};
 //  var ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
 
-  final AnalysisResults results = AnalysisResults();
+  final results = AnalysisResults();
+  final Logger log;
 
   String dirName;
+
+  WidgetCollector(this.log);
 
   String getSignature(DartType type) {
     var uri = type.element.library.location;
