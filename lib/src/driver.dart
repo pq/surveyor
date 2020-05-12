@@ -26,6 +26,7 @@ import 'package:analyzer/src/generated/engine.dart' // ignore: implementation_im
 import 'package:analyzer/src/lint/registry.dart'; // ignore: implementation_imports
 import 'package:analyzer/src/services/lint.dart'; // ignore: implementation_imports
 import 'package:args/args.dart';
+import 'package:cli_util/cli_logging.dart';
 import 'package:path/path.dart' as path;
 
 import 'common.dart';
@@ -57,6 +58,9 @@ class Driver {
   bool forceSkipInstall = false;
 
   bool silent = false;
+
+  /// Handles printing.  Can be overwritten by clients.
+  Logger logger = Logger.standard();
 
   Driver(ArgResults argResults)
       : options = CommandLineOptions.fromArgs(argResults),
@@ -234,8 +238,7 @@ class Driver {
   /// Display the following [msg] to stdout iff [silent] is false.
   void _print(String msg) {
     if (!silent) {
-      // todo (pq): replace w/ a Logger instance.
-      print(msg);
+      logger.stdout(msg);
     }
   }
 }
