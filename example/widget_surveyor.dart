@@ -19,6 +19,7 @@ import 'dart:io';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/src/generated/source.dart';
 import 'package:cli_util/cli_logging.dart';
 import 'package:corpus/corpus.dart';
 import 'package:path/path.dart' as path;
@@ -54,15 +55,15 @@ void main(List<String> args) async {
     }
   }
 
-  if (args.length == 1) {
-    var dir = args[0];
-    if (!File('$dir/pubspec.yaml').existsSync()) {
-      log.trace("Recursing into '$dir'...");
-      args = Directory(dir).listSync().map((f) => f.path).toList();
-    }
+  var corpusDir = args[0];
+  if (!File('$corpusDir/pubspec.yaml').existsSync()) {
+    log.trace("Recursing into '$corpusDir'...");
+    args = Directory(corpusDir).listSync().map((f) => f.path).toList();
+    // for testing -- just analyze a few...
+    //args = args.sublist(0, 3);
   }
 
-  var collector = WidgetCollector(log);
+  var collector = WidgetCollector(log, corpusDir);
 
   var driver = Driver.forArgs(args);
   driver.visitor = collector;
@@ -98,11 +99,12 @@ void summarizeResults(
     } else {
       ++skipCount;
     }
-    for (var count in entries) {
-      totals.update(count.key,
-          (v) => WidgetOccurrence(v.occurrences + count.value, v.projects + 1),
-          ifAbsent: () => WidgetOccurrence(count.value, 1));
-    }
+    // todo (pq): fix or remove
+//    for (var count in entries) {
+//      totals.update(count.key,
+//          (v) => WidgetOccurrence(v.occurrences + count.value, v.projects + 1),
+//          ifAbsent: () => WidgetOccurrence(count.value, 1));
+//    }
   }
 
   log.stdout('Total projects: $projectCount ($skipCount skipped)');
@@ -134,7 +136,7 @@ void summarizeResults(
 
 class AnalysisResult {
   final String appName;
-  final Map<String, int> widgetCounts;
+  final Map<String, List<String>> widgetCounts;
 
   AnalysisResult(this.appName, this.widgetCounts);
 
@@ -143,7 +145,7 @@ class AnalysisResult {
         widgetCounts = {} {
     var map = json['widgets'];
     for (var entry in map.entries) {
-      widgetCounts[entry.key] = entry.value as int;
+      widgetCounts[entry.key] = entry.value as List<String>;
     }
   }
 
@@ -228,9 +230,9 @@ class TwoGrams {
 }
 
 class WidgetCollector extends RecursiveAstVisitor
-    implements PreAnalysisCallback, PostAnalysisCallback {
+    implements AstContext, PreAnalysisCallback, PostAnalysisCallback {
 //  var TwoGrams twoGrams = TwoGrams();
-  final Map<String, int> widgets = <String, int>{};
+  final widgets = <String, List<String>>{};
 //  var ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
 
   final results = AnalysisResults();
@@ -238,10 +240,28 @@ class WidgetCollector extends RecursiveAstVisitor
 
   String dirName;
 
-  WidgetCollector(this.log);
+  String filePath;
+
+  LineInfo lineInfo;
+
+  final String corpusDir;
+
+  WidgetCollector(this.log, this.corpusDir);
+
+  String getLocation(InstanceCreationExpression node) {
+    var file = path.relative(filePath, from: corpusDir);
+    var location = lineInfo.getLocation(node.offset);
+    return '$file:${location.columnNumber}:${location.lineNumber}';
+  }
 
   String getSignature(DartType type) {
-    var uri = type.element.library.location;
+    var uri = type.element.library.source.uri;
+    if (uri.isScheme('file')) {
+      var converter = type.element.library.session.uriConverter;
+      var path = converter.uriToPath(uri);
+      uri = converter.pathToUri(path);
+    }
+
     var name = type.element.displayName;
     return '$uri#$name';
   }
@@ -260,12 +280,30 @@ class WidgetCollector extends RecursiveAstVisitor
     log.stdout("Analyzing '$dirName'...");
   }
 
+//  void write2Grams() {
+//    var fileName = '${dirName}_2gram.csv';
+//    log.trace("Writing 2-Grams to '${path.basename(fileName)}'...");
+//    //File(fileName).writeAsStringSync(twoGrams.toString());
+//  }
+
+  @override
+  void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
+
+  @override
+  void setLineInfo(LineInfo lineInfo) {
+    this.lineInfo = lineInfo;
+  }
+
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     var type = node.staticType;
     if (isWidgetType(type)) {
       var signature = getSignature(type);
-      widgets.update(signature, (v) => v + 1, ifAbsent: () => 1);
+      var location = getLocation(node);
+      widgets.update(signature, (v) => v..add(location),
+          ifAbsent: () => [location]);
 
 //      var parent =
 //          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
@@ -283,12 +321,6 @@ class WidgetCollector extends RecursiveAstVisitor
       super.visitInstanceCreationExpression(node);
     }
   }
-
-//  void write2Grams() {
-//    var fileName = '${dirName}_2gram.csv';
-//    log.trace("Writing 2-Grams to '${path.basename(fileName)}'...");
-//    //File(fileName).writeAsStringSync(twoGrams.toString());
-//  }
 
   void writeWidgetCounts() {
 //    var fileName = '${dirName}_widget.csv';

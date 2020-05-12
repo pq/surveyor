@@ -37,7 +37,7 @@ Future<void> main() async {
 
 Future<List<AnalysisResult>> analyze(String path, {Logger log}) async {
   var driver = Driver.forArgs([path]);
-  var collector = WidgetCollector(log ?? Logger.standard());
+  var collector = WidgetCollector(log ?? Logger.standard(), path);
   driver.visitor = collector;
   await driver.analyze();
   return collector.results.toList();
