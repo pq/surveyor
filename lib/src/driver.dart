@@ -235,7 +235,7 @@ class Driver {
     }
   }
 
-  /// Display the following [msg] to stdout iff [silent] is false.
+  /// Pass the following [msg] to the [logger] instance iff [silent] is false.
   void _print(String msg) {
     if (!silent) {
       logger.stdout(msg);
