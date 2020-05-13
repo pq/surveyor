@@ -66,6 +66,7 @@ void main(List<String> args) async {
   var collector = WidgetCollector(log, corpusDir);
 
   var driver = Driver.forArgs(args);
+  driver.logger = log;
   driver.visitor = collector;
 
   await driver.analyze();
@@ -93,7 +94,7 @@ void summarizeResults(
   var skipCount = 0;
   var totals = <String, WidgetOccurrence>{};
   for (var result in results) {
-    var entries = result.widgetCounts.entries;
+    var entries = result.widgetReferences.entries;
     if (entries.isNotEmpty) {
       ++projectCount;
     } else {
@@ -136,20 +137,21 @@ void summarizeResults(
 
 class AnalysisResult {
   final String appName;
-  final Map<String, List<String>> widgetCounts;
+  final Map<String, List<String>> widgetReferences;
 
-  AnalysisResult(this.appName, this.widgetCounts);
+  AnalysisResult(this.appName, this.widgetReferences);
 
   AnalysisResult.fromJson(Map<String, dynamic> json)
       : appName = json['name'],
-        widgetCounts = {} {
+        widgetReferences = {} {
     var map = json['widgets'];
     for (var entry in map.entries) {
-      widgetCounts[entry.key] = entry.value as List<String>;
+      widgetReferences[entry.key] = entry.value as List<String>;
     }
   }
 
-  Map<String, dynamic> toJson() => {'name': appName, 'widgets': widgetCounts};
+  Map<String, dynamic> toJson() =>
+      {'name': appName, 'widgets': widgetReferences};
 }
 
 // bug?
@@ -269,7 +271,7 @@ class WidgetCollector extends RecursiveAstVisitor
   @override
   void postAnalysis(SurveyorContext context, DriverCommands _) {
 //    write2Grams();
-    writeWidgetCounts();
+    writeWidgetReferences();
     widgets.clear();
   }
 
@@ -322,7 +324,7 @@ class WidgetCollector extends RecursiveAstVisitor
     }
   }
 
-  void writeWidgetCounts() {
+  void writeWidgetReferences() {
 //    var fileName = '${dirName}_widget.csv';
 //    log.trace("Writing Widget counts to '${path.basename(fileName)}'...");
 //    var sb = StringBuffer();
