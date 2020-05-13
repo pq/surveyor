@@ -23,7 +23,7 @@ Future<void> main() async {
     test('basic_app', () async {
       var results = await analyze('test/data/basic_app');
       expect(results.length, 1);
-      var counts = results[0].widgetCounts;
+      var counts = results[0].widgetReferences;
       expect(counts, containsPair('package:basic_app/main.dart#MyApp', 1));
       expect(counts,
           containsPair('package:flutter/src/material/app.dart#MaterialApp', 1));
