@@ -160,6 +160,8 @@ class AnalysisResult {
       {'name': appName, 'widgets': widgetReferences};
 }
 
+// bug: fixed in linter 0.1.116 (remove once landed)
+// ignore: prefer_mixin
 class AnalysisResults with IterableMixin<AnalysisResult> {
   final List<AnalysisResult> _results = [];
 
@@ -187,8 +189,6 @@ class AnalysisResults with IterableMixin<AnalysisResult> {
       };
 }
 
-// bug: fixed in linter 0.1.116 (remove once landed)
-// ignore: prefer_mixin
 class CSVResultWriter {
   final AnalysisResults results;
   CSVResultWriter(this.results);
