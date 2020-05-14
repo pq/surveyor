@@ -39,6 +39,9 @@ import 'package:surveyor/src/visitors.dart';
 ///
 ///     dart example/widget_surveyor.dart results.json [index.json]
 ///
+/// (This will also produce a `results.csv` file that can be used for further
+/// analysis.)
+///
 void main(List<String> args) async {
   var log = Logger.verbose();
   log.stdout('Surveying...');
@@ -100,12 +103,14 @@ void summarizeResults(
     } else {
       ++skipCount;
     }
-    // todo (pq): fix or remove
-//    for (var count in entries) {
-//      totals.update(count.key,
-//          (v) => WidgetOccurrence(v.occurrences + count.value, v.projects + 1),
-//          ifAbsent: () => WidgetOccurrence(count.value, 1));
-//    }
+    // todo (pq): update to filter/flag test/example projects
+    for (var referenceList in entries) {
+      totals.update(
+          referenceList.key,
+          (v) => WidgetOccurrence(
+              v.occurrences + referenceList.value.length, v.projects + 1),
+          ifAbsent: () => WidgetOccurrence(referenceList.value.length, 1));
+    }
   }
 
   log.stdout('Total projects: $projectCount ($skipCount skipped)');
@@ -129,10 +134,11 @@ void summarizeResults(
     var percent = (count.projects / projectCount).toStringAsFixed(2);
     log.stdout(
         '| ${padClass(name)} | ${padCount(count.occurrences.toString())} | ${padPercent(percent)} |');
-//    log.stdout('$key,${count.occurrences.toString()},$percent');
   }
   log.stdout(
       '------------------------------------------------------------------------');
+
+  CSVResultWriter(results).write();
 }
 
 class AnalysisResult {
@@ -146,7 +152,7 @@ class AnalysisResult {
         widgetReferences = {} {
     var map = json['widgets'];
     for (var entry in map.entries) {
-      widgetReferences[entry.key] = entry.value as List<String>;
+      widgetReferences[entry.key] = List.from(entry.value);
     }
   }
 
@@ -154,8 +160,6 @@ class AnalysisResult {
       {'name': appName, 'widgets': widgetReferences};
 }
 
-// bug?
-// ignore: prefer_mixin
 class AnalysisResults with IterableMixin<AnalysisResult> {
   final List<AnalysisResult> _results = [];
 
@@ -181,6 +185,28 @@ class AnalysisResults with IterableMixin<AnalysisResult> {
         // Details.
         'details': [for (var result in _results) result.toJson()]
       };
+}
+
+// bug: fixed in linter 0.1.116 (remove once landed)
+// ignore: prefer_mixin
+class CSVResultWriter {
+  final AnalysisResults results;
+  CSVResultWriter(this.results);
+
+  void write() {
+    var buffer = StringBuffer();
+    for (var result in results) {
+      for (var entry in result.widgetReferences.entries) {
+        var references = entry.value;
+        var widgetId = entry.key.replaceAll('#', ',');
+        for (var ref in references) {
+          buffer.writeln('$widgetId,$ref');
+        }
+      }
+    }
+
+    File('results.csv').writeAsStringSync(buffer.toString());
+  }
 }
 
 class ResultsReader {
