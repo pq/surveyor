@@ -194,18 +194,20 @@ class CSVResultWriter {
   CSVResultWriter(this.results);
 
   void write() {
-    var buffer = StringBuffer();
+    var file = File('results.csv');
+    var sink = file.openWrite();
+
     for (var result in results) {
       for (var entry in result.widgetReferences.entries) {
         var references = entry.value;
         var widgetId = entry.key.replaceAll('#', ',');
         for (var ref in references) {
-          buffer.writeln('$widgetId,$ref');
+          sink.writeln('$widgetId,$ref');
         }
       }
     }
 
-    File('results.csv').writeAsStringSync(buffer.toString());
+    sink.close();
   }
 }
 
