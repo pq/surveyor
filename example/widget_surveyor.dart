@@ -160,6 +160,8 @@ class AnalysisResult {
       {'name': appName, 'widgets': widgetReferences};
 }
 
+// bug: fixed in linter 0.1.116 (remove once landed)
+// ignore: prefer_mixin
 class AnalysisResults with IterableMixin<AnalysisResult> {
   final List<AnalysisResult> _results = [];
 
@@ -187,25 +189,25 @@ class AnalysisResults with IterableMixin<AnalysisResult> {
       };
 }
 
-// bug: fixed in linter 0.1.116 (remove once landed)
-// ignore: prefer_mixin
 class CSVResultWriter {
   final AnalysisResults results;
   CSVResultWriter(this.results);
 
   void write() {
-    var buffer = StringBuffer();
+    var file = File('results.csv');
+    var sink = file.openWrite();
+
     for (var result in results) {
       for (var entry in result.widgetReferences.entries) {
         var references = entry.value;
         var widgetId = entry.key.replaceAll('#', ',');
         for (var ref in references) {
-          buffer.writeln('$widgetId,$ref');
+          sink.writeln('$widgetId,$ref');
         }
       }
     }
 
-    File('results.csv').writeAsStringSync(buffer.toString());
+    sink.close();
   }
 }
 
