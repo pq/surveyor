@@ -145,10 +145,13 @@ class AnalysisResult {
   final String appName;
   final Map<String, List<String>> widgetReferences;
 
-  AnalysisResult(this.appName, this.widgetReferences);
+  final int routeCount;
+
+  AnalysisResult(this.appName, this.widgetReferences, this.routeCount);
 
   AnalysisResult.fromJson(Map<String, dynamic> json)
       : appName = json['name'],
+        routeCount = json['routes'],
         widgetReferences = {} {
     var map = json['widgets'];
     for (var entry in map.entries) {
@@ -157,7 +160,7 @@ class AnalysisResult {
   }
 
   Map<String, dynamic> toJson() =>
-      {'name': appName, 'widgets': widgetReferences};
+      {'name': appName, 'routes': routeCount, 'widgets': widgetReferences};
 }
 
 // bug: fixed in linter 0.1.116 (remove once landed)
@@ -261,9 +264,8 @@ class TwoGrams {
 
 class WidgetCollector extends RecursiveAstVisitor
     implements AstContext, PreAnalysisCallback, PostAnalysisCallback {
-//  var TwoGrams twoGrams = TwoGrams();
   final widgets = <String, List<String>>{};
-//  var ListQueue<DartType> enclosingWidgets = ListQueue<DartType>();
+  var routes = 0;
 
   final results = AnalysisResults();
   final Logger log;
@@ -281,7 +283,7 @@ class WidgetCollector extends RecursiveAstVisitor
   String getLocation(InstanceCreationExpression node) {
     var file = path.relative(filePath, from: corpusDir);
     var location = lineInfo.getLocation(node.offset);
-    return '$file:${location.columnNumber}:${location.lineNumber}';
+    return '$file:${location.lineNumber}:${location.columnNumber}';
   }
 
   String getSignature(DartType type) {
@@ -298,9 +300,9 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands _) {
-//    write2Grams();
     writeWidgetReferences();
     widgets.clear();
+    routes = 0;
   }
 
   @override
@@ -309,12 +311,6 @@ class WidgetCollector extends RecursiveAstVisitor
     dirName = path.basename(context.analysisContext.contextRoot.root.path);
     log.stdout("Analyzing '$dirName'...");
   }
-
-//  void write2Grams() {
-//    var fileName = '${dirName}_2gram.csv';
-//    log.trace("Writing 2-Grams to '${path.basename(fileName)}'...");
-//    //File(fileName).writeAsStringSync(twoGrams.toString());
-//  }
 
   @override
   void setFilePath(String filePath) {
@@ -329,27 +325,32 @@ class WidgetCollector extends RecursiveAstVisitor
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     var type = node.staticType;
+    if (implementsInterface(type, 'Route', '')) {
+      ++routes;
+    }
+
+    if (implementsInterface(type, 'MaterialApp', '')) {
+      var args = node.argumentList;
+      for (var arg in args.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'routes') {
+            var exp = arg.expression;
+            if (exp is SetOrMapLiteral) {
+              routes += exp.elements.length;
+            }
+          }
+        }
+      }
+    }
+
     if (isWidgetType(type)) {
       var signature = getSignature(type);
       var location = getLocation(node);
       widgets.update(signature, (v) => v..add(location),
           ifAbsent: () => [location]);
-
-//      var parent =
-//          enclosingWidgets.isNotEmpty ? enclosingWidgets.first : null;
-//
-//      twoGrams.add(TwoGram(parent, type));
-//
-//      enclosingWidgets.addFirst(type);
-//
-//      // Visit children.
-//      super.visitInstanceCreationExpression(node);
-//
-//      // Reset parent.
-//      enclosingWidgets.removeFirst();
-    } else {
-      super.visitInstanceCreationExpression(node);
     }
+
+    super.visitInstanceCreationExpression(node);
   }
 
   void writeWidgetReferences() {
@@ -366,7 +367,7 @@ class WidgetCollector extends RecursiveAstVisitor
 //    print(sb.toString());
 //    //File(fileName).writeAsStringSync(sb.toString());
 
-    results.add(AnalysisResult(dirName, Map.from(widgets)));
+    results.add(AnalysisResult(dirName, Map.from(widgets), routes));
   }
 }
 
