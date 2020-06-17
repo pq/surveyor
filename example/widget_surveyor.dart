@@ -39,8 +39,8 @@ import 'package:surveyor/src/visitors.dart';
 ///
 ///     dart example/widget_surveyor.dart results.json [index.json]
 ///
-/// (This will also produce a `results.csv` file that can be used for further
-/// analysis.)
+/// (This will also produce a `results.csv` file and a `routes.csv` that can be
+/// used for further analysis.)
 ///
 void main(List<String> args) async {
   var log = Logger.verbose();
@@ -197,20 +197,22 @@ class CSVResultWriter {
   CSVResultWriter(this.results);
 
   void write() {
-    var file = File('results.csv');
-    var sink = file.openWrite();
+    var resultSink = File('results.csv').openWrite();
+    var routeSink = File('routes.csv').openWrite();
 
     for (var result in results) {
       for (var entry in result.widgetReferences.entries) {
         var references = entry.value;
         var widgetId = entry.key.replaceAll('#', ',');
         for (var ref in references) {
-          sink.writeln('$widgetId,$ref');
+          resultSink.writeln('$widgetId,$ref');
         }
       }
+      routeSink.writeln('${result.appName},${result.routeCount}');
     }
 
-    sink.close();
+    resultSink.close();
+    routeSink.close();
   }
 }
 
