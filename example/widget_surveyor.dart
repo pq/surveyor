@@ -266,10 +266,13 @@ class TwoGrams {
 
 class WidgetCollector extends RecursiveAstVisitor
     implements AstContext, PreAnalysisCallback, PostAnalysisCallback {
+  /// Sentinel to indicate we can't give a reliable route count.
+  static const routesUnreliable = -1;
   final widgets = <String, List<String>>{};
-  var routes = 0;
 
+  var routes = 0;
   final results = AnalysisResults();
+
   final Logger log;
 
   String dirName;
@@ -324,9 +327,11 @@ class WidgetCollector extends RecursiveAstVisitor
     this.lineInfo = lineInfo;
   }
 
-  @override
-  void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    var type = node.staticType;
+  void updateRouteCount(DartType type, InstanceCreationExpression node) {
+    if (routes == routesUnreliable) {
+      return;
+    }
+
     if (implementsInterface(type, 'Route', '')) {
       ++routes;
     }
@@ -339,11 +344,22 @@ class WidgetCollector extends RecursiveAstVisitor
             var exp = arg.expression;
             if (exp is SetOrMapLiteral) {
               routes += exp.elements.length;
+            } else {
+              // If it's not a map literal, we can't reasonably guess at a route
+              // count so we flag it.
+              routes = routesUnreliable;
             }
           }
         }
       }
     }
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    var type = node.staticType;
+
+    updateRouteCount(type, node);
 
     if (isWidgetType(type)) {
       var signature = getSignature(type);
