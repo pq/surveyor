@@ -122,7 +122,7 @@ class Driver {
     }
   }
 
-  Future _analyze(List<String> sourceDirs, {bool forceInstall}) async {
+  Future _analyze(List<String> sourceDirs) async {
     if (sourceDirs.isEmpty) {
       _print('Specify one or more files and directories.');
       return;
