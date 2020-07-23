@@ -105,12 +105,6 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
     return '${function + generic} ($function, $generic)';
   }
 
-  String get parameterWithMetadataCount {
-    var function = functionTypeAlias.parameterWithMetadata;
-    var generic = genericTypeAlias.parameterWithMetadata;
-    return '${function + generic} ($function, $generic)';
-  }
-
   String get parameterPercents {
     String percent(int numerator, int denominator) {
       if (denominator == 0) {
@@ -119,6 +113,7 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
       var percent = numerator / denominator;
       return ((percent * 100).truncate() / 100).toStringAsFixed(2);
     }
+
     var functionNumerator = functionTypeAlias.parameterWithMetadata;
     var functionDenominator = functionTypeAlias.parameter;
     var functionPercent = percent(functionNumerator, functionDenominator);
@@ -129,6 +124,12 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
     var totalDenominator = functionDenominator + genericDenominator;
     var totalPercent = percent(totalNumerator, totalDenominator);
     return '$totalPercent% ($functionPercent%, $genericPercent%)';
+  }
+
+  String get parameterWithMetadataCount {
+    var function = functionTypeAlias.parameterWithMetadata;
+    var generic = genericTypeAlias.parameterWithMetadata;
+    return '${function + generic} ($function, $generic)';
   }
 
   @override
