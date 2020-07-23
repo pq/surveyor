@@ -73,7 +73,7 @@ void main(List<String> args) async {
   print('Notes:');
   print('- Numbers are for all function type aliases, and are followed by a');
   print('  breakdown with the numbers for old-style function type aliases');
-  print('  first, followed by the numbers for generic funtion type aliases.');
+  print('  first, followed by the numbers for generic function type aliases.');
 }
 
 int dirCount;
