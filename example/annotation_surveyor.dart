@@ -111,7 +111,7 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
         return '0.00';
       }
       var percent = numerator / denominator;
-      return ((percent * 100).truncate() / 100).toStringAsFixed(2);
+      return ((percent * 10000).truncate() / 100).toStringAsFixed(2);
     }
 
     var functionNumerator = functionTypeAlias.parameterWithMetadata;
