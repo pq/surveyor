@@ -58,6 +58,7 @@ void main(List<String> args) async {
 
   var duration = Duration(milliseconds: stopwatch.elapsedMilliseconds);
   var aliasCount = collector.aliasCount;
+  var typeCount = collector.genericFunctionType.alias;
   var parameterCount = collector.parameterCount;
   var parameterWithMetadataCount = collector.parameterWithMetadataCount;
   var percent = collector.parameterPercents;
@@ -67,13 +68,16 @@ void main(List<String> args) async {
   print('$percent of parameters in function type aliases have annotations');
   print('');
   print('Found $aliasCount function type aliases');
-  print('Found $parameterCount parameters in those aliases');
+  print('Found $typeCount generic function types not in aliases');
+  print('Found $parameterCount parameters in those aliases and function types');
   print('Found $parameterWithMetadataCount parameters with annotations');
   print('');
   print('Notes:');
-  print('- Numbers are for all function type aliases, and are followed by a');
+  print('- Numbers are for all function types, and are followed by a');
   print('  breakdown with the numbers for old-style function type aliases');
-  print('  first, followed by the numbers for generic function type aliases.');
+  print('  first, followed by the numbers for generic function type aliases,');
+  print('  followed by the numbers for generic function types outside of');
+  print('  aliases (when appropriate).');
 }
 
 int dirCount;
@@ -90,6 +94,7 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
 
   _Counts functionTypeAlias = _Counts();
   _Counts genericTypeAlias = _Counts();
+  _Counts genericFunctionType = _Counts();
 
   AnnotationUseCollector();
 
@@ -102,7 +107,8 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
   String get parameterCount {
     var function = functionTypeAlias.parameter;
     var generic = genericTypeAlias.parameter;
-    return '${function + generic} ($function, $generic)';
+    var type = genericFunctionType.parameter;
+    return '${function + generic + type} ($function, $generic, $type)';
   }
 
   String get parameterPercents {
@@ -117,19 +123,28 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
     var functionNumerator = functionTypeAlias.parameterWithMetadata;
     var functionDenominator = functionTypeAlias.parameter;
     var functionPercent = percent(functionNumerator, functionDenominator);
+
     var genericNumerator = genericTypeAlias.parameterWithMetadata;
     var genericDenominator = genericTypeAlias.parameter;
     var genericPercent = percent(genericNumerator, genericDenominator);
-    var totalNumerator = functionNumerator + genericNumerator;
-    var totalDenominator = functionDenominator + genericDenominator;
+
+    var typeNumerator = genericFunctionType.parameterWithMetadata;
+    var typeDenominator = genericFunctionType.parameter;
+    var typePercent = percent(typeNumerator, typeDenominator);
+
+    var totalNumerator = functionNumerator + typeNumerator + genericNumerator;
+    var totalDenominator =
+        functionDenominator + typeDenominator + genericDenominator;
     var totalPercent = percent(totalNumerator, totalDenominator);
-    return '$totalPercent% ($functionPercent%, $genericPercent%)';
+
+    return '$totalPercent% ($functionPercent%, $genericPercent%, $typePercent%)';
   }
 
   String get parameterWithMetadataCount {
     var function = functionTypeAlias.parameterWithMetadata;
     var generic = genericTypeAlias.parameterWithMetadata;
-    return '${function + generic} ($function, $generic)';
+    var type = genericFunctionType.parameterWithMetadata;
+    return '${function + generic + type} ($function, $generic, $type)';
   }
 
   @override
@@ -165,6 +180,14 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
   void visitFunctionTypeAlias(FunctionTypeAlias node) {
     functionTypeAlias.countParameters(node.parameters.parameters);
     return super.visitFunctionTypeAlias(node);
+  }
+
+  @override
+  void visitGenericFunctionType(GenericFunctionType node) {
+    if (node.parent is! GenericTypeAlias) {
+      genericFunctionType.countParameters(node.parameters.parameters);
+    }
+    super.visitGenericFunctionType(node);
   }
 
   @override
