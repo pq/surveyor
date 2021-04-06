@@ -3,6 +3,9 @@ description: Tools for surveying Dart sources
 version: 0.0.1
 homepage: https://github.com/pq/surveyor
 
+# Not intended for publishing.
+publish_to: none
+
 environment:
   sdk: '>=2.2.2 <3.0.0'
 
