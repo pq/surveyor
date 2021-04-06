@@ -27,8 +27,11 @@ jobs:
       - name: Install package dependencies
         run: dart pub get
         
-      - name: Install example dependencies
-        run: dart pub get example
+      - name: Install widget_surveyor example dependencies
+        run:  (cd example/widget_surveyor; dart pub get)
+
+      - name: Install doc_surveyor example dependencies
+        run:  (cd example/doc_surveyor; dart pub get)       
 
       # Uncomment this step to verify the use of 'dart format' on each commit.
       # - name: Verify formatting
