@@ -1,0 +1,17 @@
+name: widget_surveyor
+description: Sample project that performs widget surveying.
+
+environment:
+  sdk: '>=2.2.2 <3.0.0'
+
+dependencies:
+  analyzer: ^0.39.4
+  corpus:
+    # update when published
+    git: git://github.com/pq/corpus.git
+  surveyor:
+    path: ../..
+
+
+dev_dependencies:
+  test: ^1.14.0

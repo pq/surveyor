@@ -61,7 +61,7 @@ Score: 0.98
 
 ### Surveying Widget Use
 
-    dart example/widget_surveyor.dart <path_to_project>
+    dart example/widget_surveyor/widget_surveyor.dart <path_to_project>
 
 will analyze the project at the given path and present a list of found `Widget` child-parent 2-Grams.
 

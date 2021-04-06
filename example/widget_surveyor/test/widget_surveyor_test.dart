@@ -15,8 +15,9 @@
 import 'package:cli_util/cli_logging.dart';
 import 'package:surveyor/src/driver.dart';
 import 'package:test/test.dart';
+import 'package:widget_surveyor/widget_surveyor.dart';
 
-import '../example/widget_surveyor.dart';
+// import '..widget_surveyor.dart';
 
 Future<void> main() async {
   group('widget survey', () {
