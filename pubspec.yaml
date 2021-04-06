@@ -16,11 +16,6 @@ dependencies:
   # required by example/lint_surveyor
   # linter:  ^0.1.100
   pub_semver: ^1.0.0
-  tuple: ^1.0.0
-
-#dependency_overrides:
-#  corpus:
-#    path: ../corpus
 
 dev_dependencies:
   pedantic: ^1.0.0
