@@ -49,7 +49,10 @@ class Spelunker {
     var stringSource = StringSource(contents, path);
     var featureSet = FeatureSet.fromEnableFlags([]);
     var scanner = Scanner(stringSource, reader, errorListener)
-      ..configureFeatures(featureSet);
+      ..configureFeatures(
+        featureSet: featureSet,
+        featureSetForOverriding: featureSet,
+      );
     var startToken = scanner.tokenize();
 
     errorListener.throwIfErrors();
