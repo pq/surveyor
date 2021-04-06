@@ -33,13 +33,12 @@ jobs:
       - name: Install doc_surveyor example dependencies
         run:  (cd example/doc_surveyor; dart pub get)       
 
-      # Uncomment this step to verify the use of 'dart format' on each commit.
-      # - name: Verify formatting
-      #   run: dart format --output=none --set-exit-if-changed .
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
 
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
-      - name: Run example tests
-        run: (cd example/widget_surveyor; dart test)
+      # Enable when fixed (https://github.com/pq/surveyor/issues/27)
+      # - name: Run example tests
+      #  run: (cd example/widget_surveyor; dart test)
