@@ -1,7 +1,7 @@
 # 📐 surveyor
 Tools for surveying Dart packages.
 
-[![Build Status](https://travis-ci.org/pq/surveyor.svg)](https://travis-ci.org/pq/surveyor)
+[![Build Status](https://github.com/pq/surveyor/workflows/linter/badge.svg)](https://github.com/pq/surveyor/actions)
 
 **Disclaimer:** This is not an officially supported Google product.
 
