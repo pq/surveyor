@@ -52,10 +52,10 @@ void main(List<String> args) async {
   await driver.analyze();
 }
 
-int dirCount;
+int dirCount = 0;
 
 /// If non-zero, stops once limit is reached (for debugging).
-int _debuglimit; //500;
+int? _debuglimit; //500;
 
 class AsyncCollector extends RecursiveAstVisitor
     implements
@@ -65,9 +65,9 @@ class AsyncCollector extends RecursiveAstVisitor
         AstContext {
   int count = 0;
   int contexts = 0;
-  String filePath;
-  Folder currentFolder;
-  LineInfo lineInfo;
+  String? filePath;
+  late Folder currentFolder;
+  LineInfo? lineInfo;
   Set<Folder> contextRoots = <Folder>{};
 
   // id: inDecl, notInDecl
@@ -96,14 +96,15 @@ class AsyncCollector extends RecursiveAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    var debugLimit = _debuglimit;
+    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
-    if (subDir) {
+      {bool? subDir, DriverCommands? commandCallback}) {
+    if (subDir ?? false) {
       ++dirCount;
     }
     var contextRoot = context.analysisContext.contextRoot;
@@ -125,10 +126,13 @@ class AsyncCollector extends RecursiveAstVisitor
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
+    var lineInfo = this.lineInfo;
+    if (lineInfo == null) return;
+
     var id = node.name;
 
-    if (occurrences.containsKey(id)) {
-      var occurrence = occurrences[id];
+    var occurrence = occurrences[id];
+    if (occurrence != null) {
       if (node.inDeclarationContext()) {
         occurrence.decls++;
       } else {

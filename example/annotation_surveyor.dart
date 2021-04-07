@@ -80,17 +80,17 @@ void main(List<String> args) async {
   print('  aliases (when appropriate).');
 }
 
-int dirCount;
+int dirCount = 0;
 
 /// If non-zero, stops once limit is reached (for debugging).
-int _debugLimit; //500;
+int? _debugLimit; //500;
 
 class AnnotationUseCollector extends RecursiveAstVisitor<void>
     implements PreAnalysisCallback, PostAnalysisCallback, AstContext {
   int count = 0;
-  String filePath;
-  LineInfo lineInfo;
-  Folder currentFolder;
+  String? filePath;
+  LineInfo? lineInfo;
+  Folder? currentFolder;
 
   _Counts functionTypeAlias = _Counts();
   _Counts genericTypeAlias = _Counts();
@@ -149,14 +149,15 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debugLimit == null || count < _debugLimit;
+    var debugLimit = _debugLimit;
+    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
-    if (subDir) {
+      {bool? subDir, DriverCommands? commandCallback}) {
+    if (subDir ?? false) {
       ++dirCount;
     }
     var contextRoot = context.analysisContext.contextRoot;
@@ -192,7 +193,10 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
 
   @override
   void visitGenericTypeAlias(GenericTypeAlias node) {
-    genericTypeAlias.countParameters(node.functionType.parameters.parameters);
+    var parameters = node.functionType?.parameters.parameters;
+    if (parameters != null) {
+      genericTypeAlias.countParameters(parameters);
+    }
     return super.visitGenericTypeAlias(node);
   }
 }

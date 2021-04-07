@@ -1,5 +1,3 @@
-main() async {
-
-}
+main() async {}
 
 var async = 0;

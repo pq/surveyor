@@ -20,11 +20,11 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
-import 'package:analyzer/src/dart/ast/token.dart';
 import 'package:analyzer/src/dart/scanner/reader.dart';
 import 'package:analyzer/src/dart/scanner/scanner.dart';
 import 'package:analyzer/src/generated/parser.dart' show Parser;
 import 'package:analyzer/src/string_source.dart' show StringSource;
+import 'package:pub_semver/pub_semver.dart';
 
 void main(List<String> args) {
   if (args.length != 1) {
@@ -38,7 +38,7 @@ class Spelunker {
   final String path;
   final IOSink sink;
 
-  Spelunker(this.path, {IOSink sink}) : sink = sink ?? stdout;
+  Spelunker(this.path, {IOSink? sink}) : sink = sink ?? stdout;
 
   void spelunk() {
     var contents = File(path).readAsStringSync();
@@ -47,7 +47,10 @@ class Spelunker {
 
     var reader = CharSequenceReader(contents);
     var stringSource = StringSource(contents, path);
-    var featureSet = FeatureSet.fromEnableFlags([]);
+    var featureSet = FeatureSet.fromEnableFlags2(
+      sdkLanguageVersion: Version.parse('2.12.0'),
+      flags: [],
+    );
     var scanner = Scanner(stringSource, reader, errorListener)
       ..configureFeatures(
         featureSet: featureSet,
@@ -77,14 +80,12 @@ class _SourceVisitor extends GeneralizingAstVisitor {
   String asString(AstNode node) =>
       '${typeInfo(node.runtimeType)} [${node.toString()}]';
 
-  List<CommentToken> getPrecedingComments(Token token) {
-    var comments = <CommentToken>[];
-    var comment = token.precedingComments;
-    while (comment is CommentToken) {
-      comments.add(comment);
+  Iterable<Token> getPrecedingComments(Token token) sync* {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      yield comment;
       comment = comment.next;
     }
-    return comments;
   }
 
   String getTrailingComment(AstNode node) {

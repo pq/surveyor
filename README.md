@@ -17,35 +17,35 @@ From there you can run the `examples`.
 
 ### Surveying API Use
 
-    dart example/api_surveyor.dart <path_to_project>
+    dart run example/api_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify uses of a few specific APIs.
 
 ### Surveying `async` Identifier Use
 
-    dart example/async_surveyor.dart <path_to_project>
+    dart run example/async_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify places where `"async"` is used as a simple identifer.  These places would produce errors if `async` become a reserved keyword.
 
 Note that this generates a lot of output.  To make sure none of it is lost, consider redirecting to a file.  For example:
 
-    dart example/async_surveyor.dart  <path>  2>&1 | tee survey_out.txt
+    dart run example/async_surveyor.dart  <path>  2>&1 | tee survey_out.txt
 
 ### Surveying Errors
 
-    dart example/error_surveyor.dart <path_to_project>
+    dart run example/error_surveyor.dart <path_to_project>
 
 will analyze projects at the given path, filtering for errors.
 
 ### Surveying Lint Rule Violations
 
-    dart example/lint_surveyor.dart <path_to_project>
+    dart run example/lint_surveyor.dart <path_to_project>
 
 will analyze projects at the given path and identify violations of lint rules (custom rules or ones defined by `package:linter`).
 
 ### Surveying API Doc Scoring
 
-    dart example/doc_surveyor/lib/main.dart <path_to_project>
+    dart run example/doc_surveyor/lib/main.dart <path_to_project>
  
 will analyze the project at the given path flagging public members that are missing API docs.
 
@@ -61,7 +61,7 @@ Score: 0.98
 
 ### Surveying Widget Use
 
-    dart example/widget_surveyor/widget_surveyor.dart <path_to_project>
+    dart run example/widget_surveyor/lib/widget_surveyor.dart <path_to_project>
 
 will analyze the project at the given path and present a list of found `Widget` child-parent 2-Grams.
 

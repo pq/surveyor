@@ -63,7 +63,7 @@ class _Installer {
   bool hasDependenciesInstalled(Package package) =>
       package.dir.existsSync() && package.packagesFile.existsSync();
 
-  Future<ProcessResult> installDependencies(Package package,
+  Future<ProcessResult?> installDependencies(Package package,
       {bool silent = false}) async {
     var sourcePath = package.dir.path;
     if (!package.dir.existsSync()) {
@@ -75,7 +75,7 @@ class _Installer {
       return null;
     }
 
-    if (package.dependencies?.containsKey('flutter') == true) {
+    if (package.dependencies.containsKey('flutter') == true) {
       _print(
           'Running "flutter packages get" in ${pathutil.basename(sourcePath)}',
           silent);

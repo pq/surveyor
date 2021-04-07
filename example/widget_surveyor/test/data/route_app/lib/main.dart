@@ -44,7 +44,7 @@ class SecondScreen extends StatelessWidget {
       body: Center(
         child: RaisedButton(
           onPressed: () {
-             Navigator.pop(context);
+            Navigator.pop(context);
           },
           child: Text('Go back!'),
         ),
@@ -52,7 +52,6 @@ class SecondScreen extends StatelessWidget {
     );
   }
 }
-
 
 void main2() {
   runApp(MaterialApp(

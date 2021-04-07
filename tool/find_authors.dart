@@ -121,7 +121,9 @@ void main(List<String> args) async {
     var json = jsonDecode(await getBody('https://pub.dev/api/packages/$p'));
     var details = hasDartAuthor(json)
         ? ' (Dart)'
-        : hasFlutterAuthor(json) ? ' (Flutter)' : '';
+        : hasFlutterAuthor(json)
+            ? ' (Flutter)'
+            : '';
     print('$p$details');
   }
 }

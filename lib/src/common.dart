@@ -22,7 +22,8 @@ var _client = http.Client();
 
 Future<String> getBody(String url) async => (await getResponse(url)).body;
 
-Future<http.Response> getResponse(String url) async => _client.get(url);
+Future<http.Response> getResponse(String url) async =>
+    _client.get(Uri.parse(url));
 
 /// Returns a [Future] that completes after the [event loop][] has run the given
 /// number of [times] (20 by default).
@@ -31,8 +32,7 @@ Future<http.Response> getResponse(String url) async => _client.get(url);
 ///
 /// Awaiting this approximates waiting until all asynchronous work (other than
 /// work that's waiting for external resources) completes.
-Future pumpEventQueue({int times}) {
-  times ??= 20;
+Future pumpEventQueue({int times = 20}) {
   if (times == 0) return Future.value();
   // Use [new Future] future to allow microtask events to finish. The [new
   // Future.value] constructor uses scheduleMicrotask itself and would therefore
@@ -45,28 +45,31 @@ double toDouble(Object value) {
   if (value is double) {
     return value;
   }
-  try {
-    return double.parse(value);
-  } on FormatException {
-    rethrow;
+  if (value is String) {
+    try {
+      return double.parse(value);
+    } on FormatException {
+      rethrow;
+    }
   }
+  throw FormatException('$value cannot be parsed to a double');
 }
 
 int toInt(Object value) {
   if (value is int) {
     return value;
   }
-  try {
-    return int.parse(value);
-  } on FormatException {
-    rethrow;
+  if (value is String) {
+    try {
+      return int.parse(value);
+    } on FormatException {
+      rethrow;
+    }
   }
+  throw FormatException('$value cannot be parsed to an int');
 }
 
 YamlMap _readYamlFromString(String optionsSource) {
-  if (optionsSource == null) {
-    return YamlMap();
-  }
   try {
     var doc = loadYamlNode(optionsSource);
     if (doc is YamlMap) {
@@ -83,9 +86,9 @@ YamlMap _readYamlFromString(String optionsSource) {
 class AnalysisOptionsFile {
   File file;
 
-  String _contents;
+  String? _contents;
+  YamlMap? _yaml;
 
-  YamlMap _yaml;
   AnalysisOptionsFile(String path) : file = File(path);
 
   String get contents => _contents ??= file.readAsStringSync();
@@ -126,9 +129,9 @@ class CommandLineOptions {
 class PubspecFile {
   File file;
 
-  String _contents;
+  String? _contents;
+  YamlMap? _yaml;
 
-  YamlMap _yaml;
   PubspecFile(String path) : file = File(path);
 
   String get contents => _contents ??= file.readAsStringSync();
