@@ -39,8 +39,8 @@ void main(List<String> args) async {
     }
   }
 
-  if (_debuglimit != null) {
-    print('Limiting analysis to $_debuglimit packages.');
+  if (_debugLimit != 0) {
+    print('Limiting analysis to $_debugLimit packages.');
   }
 
   var driver = Driver.forArgs(args);
@@ -55,7 +55,7 @@ void main(List<String> args) async {
 int dirCount = 0;
 
 /// If non-zero, stops once limit is reached (for debugging).
-int? _debuglimit; //500;
+int _debugLimit = 0; //500;
 
 class AsyncCollector extends RecursiveAstVisitor
     implements
@@ -96,8 +96,8 @@ class AsyncCollector extends RecursiveAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    var debugLimit = _debuglimit;
-    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
+    var debugLimit = _debugLimit;
+    cmd.continueAnalyzing = debugLimit == 0 || count < debugLimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
