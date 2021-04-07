@@ -4,7 +4,6 @@ void main() => runApp(MyApp());
 
 class MyApp extends MaterialApp {
   Widget build(BuildContext context) {
-
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -35,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),

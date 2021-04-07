@@ -16,13 +16,12 @@
 
 import 'dart:io';
 
-import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/element/inheritance_manager3.dart';
-import 'package:analyzer/src/generated/resolver.dart';
+import 'package:analyzer/src/dart/resolver/scope.dart';
 import 'package:analyzer/src/generated/source.dart';
 import 'package:path/path.dart' as path;
 import 'package:surveyor/src/analysis.dart';
@@ -69,24 +68,25 @@ class SourceLocation {
 
 class _Visitor extends RecursiveAstVisitor
     implements PreAnalysisCallback, AstContext {
-  bool isInLibFolder;
+  bool isInLibFolder = false;
 
-  AnalysisContext context;
+  late InheritanceManager3 inheritanceManager;
 
-  InheritanceManager3 inheritanceManager;
+  String? filePath;
 
-  String filePath;
+  LineInfo? lineInfo;
 
-  LineInfo lineInfo;
-
-  Set<Element> apiElements;
+  Set<Element> apiElements = {};
 
   DocStats stats = DocStats();
 
   _Visitor();
 
   bool check(Declaration node) {
-    bool apiContains(Element element) {
+    var lineInfo = this.lineInfo;
+    if (lineInfo == null) return false;
+
+    bool apiContains(Element? element) {
       while (element != null) {
         if (!element.isPrivate && apiElements.contains(element)) {
           return true;
@@ -104,32 +104,40 @@ class _Visitor extends RecursiveAstVisitor
 
     if (node.documentationComment == null && !isOverridingMember(node)) {
       var location = lineInfo.getLocation(node.offset);
-      if (location != null) {
-        stats.undocumentedMemberLocations.add(SourceLocation(
-            node.declaredElement.displayName,
-            node.declaredElement.source,
-            location.lineNumber,
-            location.columnNumber));
+
+      var declaredElement = node.declaredElement;
+      if (declaredElement != null) {
+        var source = declaredElement.source;
+        if (source != null) {
+          stats.undocumentedMemberLocations.add(SourceLocation(
+              declaredElement.displayName,
+              source,
+              location.lineNumber,
+              location.columnNumber));
+          return true;
+        }
       }
-      return true;
     }
     return false;
   }
 
-  Element getOverriddenMember(Element member) {
+  Element? getOverriddenMember(Element? member) {
     if (member == null) {
       return null;
     }
 
-    // ignore: omit_local_variable_types
-    ClassElement classElement = member.thisOrAncestorOfType<ClassElement>();
+    var classElement = member.thisOrAncestorOfType<ClassElement>();
     if (classElement == null) {
       return null;
     }
     var libraryUri = classElement.library.source.uri;
+    var memberName = member.name;
+    if (memberName == null) {
+      return null;
+    }
     return inheritanceManager.getInherited(
       classElement.thisType,
-      Name(libraryUri, member.name),
+      Name(libraryUri, memberName),
     );
   }
 
@@ -138,7 +146,7 @@ class _Visitor extends RecursiveAstVisitor
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
+      {bool? subDir, DriverCommands? commandCallback}) {
     inheritanceManager = InheritanceManager3();
   }
 
@@ -192,18 +200,21 @@ class _Visitor extends RecursiveAstVisitor
     for (var setter in setters) {
       var getter = getters[setter.name.name];
       if (getter == null) {
-        var libraryUri = node.declaredElement.library.source.uri;
-        // Look for an inherited getter.
-        var getter = inheritanceManager.getMember(
-          node.declaredElement.thisType,
-          Name(libraryUri, setter.name.name),
-        );
-        if (getter is PropertyAccessorElement) {
-          if (getter.documentationComment != null) {
-            continue;
+        var declaredElement = node.declaredElement;
+        if (declaredElement != null) {
+          var libraryUri = declaredElement.library.source.uri;
+          // Look for an inherited getter.
+          var getter = inheritanceManager.getMember(
+            declaredElement.thisType,
+            Name(libraryUri, setter.name.name),
+          );
+          if (getter is PropertyAccessorElement) {
+            if (getter.documentationComment != null) {
+              continue;
+            }
           }
+          check(setter);
         }
-        check(setter);
       } else if (missingDocs.contains(getter)) {
         check(setter);
       }
@@ -228,11 +239,15 @@ class _Visitor extends RecursiveAstVisitor
     apiElements = <Element>{};
 
     var package = getPackage(node);
+    if (package == null) return;
+
     // Ignore this compilation unit if it's not in the lib/ folder.
     isInLibFolder = isInLibDir(node, package);
     if (!isInLibFolder) return;
 
-    var library = node.declaredElement.library;
+    var library = node.declaredElement?.library;
+    if (library == null) return;
+
     var namespaceBuilder = NamespaceBuilder();
     var exports = namespaceBuilder.createExportNamespaceForLibrary(library);
     var public = namespaceBuilder.createPublicNamespaceForLibrary(library);
@@ -289,7 +304,10 @@ class _Visitor extends RecursiveAstVisitor
   void visitConstructorDeclaration(ConstructorDeclaration node) {
     if (!isInLibFolder) return;
 
-    if (!inPrivateMember(node) && !isPrivate(node.name)) {
+    var nodeName = node.name;
+    if (nodeName == null) return;
+
+    if (!inPrivateMember(node) && !isPrivate(nodeName)) {
       check(node);
     }
   }
@@ -316,7 +334,10 @@ class _Visitor extends RecursiveAstVisitor
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     if (!isInLibFolder) return;
 
-    if (node.name == null || isPrivate(node.name)) {
+    var nodeName = node.name;
+    if (nodeName == null) return;
+
+    if (node.name == null || isPrivate(nodeName)) {
       return;
     }
 

@@ -38,8 +38,8 @@ void main(List<String> args) async {
     }
   }
 
-  if (_debuglimit != null) {
-    print('Limiting analysis to $_debuglimit packages.');
+  if (_debugLimit != null) {
+    print('Limiting analysis to $_debugLimit packages.');
   }
 
   var stopwatch = Stopwatch()..start();
@@ -56,18 +56,18 @@ void main(List<String> args) async {
       '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
 }
 
-int dirCount;
+int dirCount = 0;
 
 /// If non-zero, stops once limit is reached (for debugging).
-int _debuglimit; //500;
+int? _debugLimit; //500;
 
 class ApiUseCollector extends RecursiveAstVisitor
     implements PreAnalysisCallback, PostAnalysisCallback, AstContext {
   int count = 0;
   int contexts = 0;
-  String filePath;
-  Folder currentFolder;
-  LineInfo lineInfo;
+  String? filePath;
+  Folder? currentFolder;
+  LineInfo? lineInfo;
 
   List<String> reports = <String>[];
 
@@ -75,14 +75,15 @@ class ApiUseCollector extends RecursiveAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    var debugLimit = _debugLimit;
+    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
     // Reporting done in visitSimpleIdentifier.
   }
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
-    if (subDir) {
+      {bool? subDir, DriverCommands? commandCallback}) {
+    if (subDir ?? false) {
       ++dirCount;
     }
     var contextRoot = context.analysisContext.contextRoot;
@@ -104,6 +105,9 @@ class ApiUseCollector extends RecursiveAstVisitor
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    var lineInfo = this.lineInfo;
+    if (lineInfo == null) return;
+
     var location;
     var name = node.methodName.name;
     if (name == 'transform' || name == 'pipe') {
@@ -120,7 +124,7 @@ class ApiUseCollector extends RecursiveAstVisitor
 
     if (location != null) {
       print(
-          '${node.staticType.element?.name}.$name: $filePath:${location.lineNumber}:${location.columnNumber}');
+          '${node.staticType?.element?.name}.$name: $filePath:${location.lineNumber}:${location.columnNumber}');
     }
 
     super.visitMethodInvocation(node);

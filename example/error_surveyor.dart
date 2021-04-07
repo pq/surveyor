@@ -65,10 +65,10 @@ void main(List<String> args) async {
       '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
 }
 
-int dirCount;
+int dirCount = 0;
 
 /// If non-null, stops once limit is reached (for debugging).
-int _debuglimit;
+int? _debuglimit;
 
 class AnalysisAdvisor extends SimpleAstVisitor
     implements
@@ -78,11 +78,10 @@ class AnalysisAdvisor extends SimpleAstVisitor
         ErrorReporter {
   int count = 0;
 
-  AnalysisStats stats;
-  HumanErrorFormatter formatter;
+  final AnalysisStats stats;
+  late final HumanErrorFormatter formatter;
 
-  AnalysisAdvisor() {
-    stats = AnalysisStats();
+  AnalysisAdvisor() : stats = AnalysisStats() {
     formatter = HumanErrorFormatter(stdout, stats);
   }
 
@@ -93,20 +92,21 @@ class AnalysisAdvisor extends SimpleAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    var debugLimit = _debuglimit;
+    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
   }
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
-    if (subDir) {
+      {bool? subDir, DriverCommands? commandCallback}) {
+    if (subDir ?? false) {
       ++dirCount;
     }
     var root = context.analysisContext.contextRoot.root;
     var dirName = path.basename(root.path);
-    if (subDir) {
+    if (subDir ?? false) {
       // Qualify.
-      dirName = '${path.basename(root.parent.path)}/$dirName';
+      dirName = '${path.basename(root.parent2.path)}/$dirName';
     }
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }

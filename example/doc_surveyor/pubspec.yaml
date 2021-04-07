@@ -2,12 +2,9 @@ name: doc_surveyor
 description: Sample project that computes missing API doc stats.
 
 environment:
-  sdk: '>=2.2.0 <3.0.0'
+  sdk: '>=2.12.0-0 <3.0.0'
 
 dependencies:
-  analyzer: ^0.39.4
+  analyzer: ^1.3.0
   surveyor:
-    # todo(pq): update when surveyor gets published.
-    git:
-     url: https://github.com/pq/surveyor
-     ref: 607416fe2216591c10331b96ffcbe8beeac18fff
+    path: ../..

@@ -71,10 +71,10 @@ void main(List<String> args) async {
       '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
 }
 
-int dirCount;
+int dirCount = 0;
 
 /// If non-null, stops once limit is reached (for debugging).
-int _debuglimit; // = 300;
+int? _debuglimit; // = 300;
 
 class AnalysisAdvisor extends SimpleAstVisitor
     implements
@@ -85,10 +85,9 @@ class AnalysisAdvisor extends SimpleAstVisitor
   int count = 0;
 
   AnalysisStats stats;
-  HumanErrorFormatter formatter;
+  late HumanErrorFormatter formatter;
 
-  AnalysisAdvisor() {
-    stats = AnalysisStats();
+  AnalysisAdvisor() : stats = AnalysisStats() {
     formatter = HumanErrorFormatter(stdout, stats);
   }
 
@@ -99,12 +98,14 @@ class AnalysisAdvisor extends SimpleAstVisitor
 
   @override
   void postAnalysis(SurveyorContext context, DriverCommands cmd) {
-    cmd.continueAnalyzing = _debuglimit == null || count < _debuglimit;
+    var debugLimit = _debuglimit;
+    cmd.continueAnalyzing = debugLimit == null || count < debugLimit;
   }
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
+      {bool? subDir, DriverCommands? commandCallback}) {
+    subDir ??= false;
     if (subDir) {
       ++dirCount;
     }
@@ -112,7 +113,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
     var dirName = path.basename(root.path);
     if (subDir) {
       // Qualify.
-      dirName = '${path.basename(root.parent.path)}/$dirName';
+      dirName = '${path.basename(root.parent2.path)}/$dirName';
     }
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }
@@ -153,8 +154,8 @@ void f(int x) {
             group: Group.errors);
 
   @override
-  void registerNodeProcessors(NodeLintRegistry registry,
-      [LinterContext context]) {
+  void registerNodeProcessors(
+      NodeLintRegistry registry, LinterContext context) {
     var visitor = _Visitor(this);
     registry.addMethodInvocation(this, visitor);
   }
