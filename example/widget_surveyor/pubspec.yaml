@@ -10,8 +10,10 @@ dependencies:
     # update when published
     git: git://github.com/pq/corpus.git
   surveyor:
-    path: ../..
-
+    # update when published
+    git:
+      url: git://github.com/pq/surveyor.git
+      ref: 7ffa98e549aa88c5beabde7aec30d44dd1323c3b
 
 dev_dependencies:
   test: ^1.14.0
