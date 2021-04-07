@@ -27,7 +27,7 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// Run like so:
 ///
-/// dart example/async_surveyor.dart <source dir>
+/// dart run example/async_surveyor.dart <source dir>
 void main(List<String> args) async {
   if (args.length == 1) {
     var dir = args[0];

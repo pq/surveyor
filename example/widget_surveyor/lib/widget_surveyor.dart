@@ -33,13 +33,13 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// Run like so:
 ///
-///     dart example/widget_surveyor.dart <source dir>
+///     dart run example/widget_surveyor.dart <source dir>
 ///
 /// Results are output in a file `results.json`.  To get a summary
 /// of the results, pass `results.json` and optionally a corpus `index.json` as
 /// sole arguments to the surveyor:
 ///
-///     dart example/widget_surveyor.dart results.json [index.json]
+///     dart run example/widget_surveyor.dart results.json [index.json]
 ///
 /// (This will also produce a `results.csv` file and a `routes.csv` that can be
 /// used for further analysis.)

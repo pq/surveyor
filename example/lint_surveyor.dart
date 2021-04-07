@@ -29,7 +29,7 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// Run like so:
 ///
-/// dart example/lint_surveyor.dart <source dir>
+/// dart run example/lint_surveyor.dart <source dir>
 void main(List<String> args) async {
   var stopwatch = Stopwatch()..start();
 
