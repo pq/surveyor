@@ -14,11 +14,11 @@
 
 import 'dart:io' as io;
 
-import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:analyzer/src/dart/analysis/analysis_context_collection.dart'; // ignore: implementation_imports
 import 'package:analyzer/src/generated/engine.dart' // ignore: implementation_imports
     show
         AnalysisOptionsImpl;
@@ -64,16 +64,23 @@ class Driver {
 
   bool silent = false;
 
+  final String? sdkPath;
+
   /// Handles printing.  Can be overwritten by clients.
   Logger logger = Logger.standard();
 
-  Driver(ArgResults argResults)
-      : options = CommandLineOptions.fromArgs(argResults),
+  Driver(
+    ArgResults argResults, {
+    this.sdkPath,
+  })  : options = CommandLineOptions.fromArgs(argResults),
         sources = argResults.rest
             .map((p) => path.normalize(io.File(p).absolute.path))
             .toList();
 
-  factory Driver.forArgs(List<String> args) {
+  factory Driver.forArgs(
+    List<String> args, {
+    String? sdkPath,
+  }) {
     var argParser = ArgParser()
       ..addFlag('verbose', abbr: 'v', help: 'verbose output.')
       ..addFlag('force-install', help: 'force package (re)installation.')
@@ -143,10 +150,12 @@ class Driver {
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
-        var collection = AnalysisContextCollection(
+        // todo(pq):replace w/ AnalysisContextCollection post analyzer 1.4.0.
+        var collection = AnalysisContextCollectionImpl(
           includedPaths: [root],
           excludedPaths: excludedPaths.map((p) => path.join(root, p)).toList(),
           resourceProvider: resourceProvider,
+          sdkPath: sdkPath,
         );
 
         var lints = this.lints;
@@ -240,12 +249,12 @@ class Driver {
     }
   }
 
-  /// Returns `true` if this [fileName] is a Dart file.
-  bool isDartFileName(String fileName) => fileName.endsWith('.dart');
-
   /// Returns `true` if this [fileName] is an analysis options file.
-  bool isAnalysisOptionsFileName(String fileName) =>
+  static bool isAnalysisOptionsFileName(String fileName) =>
       fileName == 'analysis_options.yaml';
+
+  /// Returns `true` if this [fileName] is a Dart file.
+  static bool isDartFileName(String fileName) => fileName.endsWith('.dart');
 }
 
 class DriverCommands {
