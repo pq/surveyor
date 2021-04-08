@@ -110,11 +110,15 @@ class CommandLineOptions {
   /// Skip package dependency install checks.
   bool skipInstall;
 
+  /// Set a custom SDK location.
+  String? sdk;
+
   CommandLineOptions({
     this.verbose = false,
     this.color = false,
     this.forceInstall = false,
     this.skipInstall = false,
+    this.sdk,
   });
 
   CommandLineOptions.fromArgs(ArgResults args)
@@ -123,6 +127,7 @@ class CommandLineOptions {
           color: args['color'],
           forceInstall: args['force-install'],
           skipInstall: args['skip-install'],
+          sdk: args['sdk'],
         );
 }
 

@@ -64,28 +64,26 @@ class Driver {
 
   bool silent = false;
 
-  final String? sdkPath;
+  String? sdkPath;
 
   /// Handles printing.  Can be overwritten by clients.
   Logger logger = Logger.standard();
 
-  Driver(
-    ArgResults argResults, {
-    this.sdkPath,
-  })  : options = CommandLineOptions.fromArgs(argResults),
+  Driver(ArgResults argResults)
+      : options = CommandLineOptions.fromArgs(argResults),
         sources = argResults.rest
             .map((p) => path.normalize(io.File(p).absolute.path))
-            .toList();
+            .toList() {
+    sdkPath = options.sdk;
+  }
 
-  factory Driver.forArgs(
-    List<String> args, {
-    String? sdkPath,
-  }) {
+  factory Driver.forArgs(List<String> args) {
     var argParser = ArgParser()
       ..addFlag('verbose', abbr: 'v', help: 'verbose output.')
       ..addFlag('force-install', help: 'force package (re)installation.')
       ..addFlag('skip-install', help: 'skip package install checks.')
-      ..addFlag('color', help: 'color output.');
+      ..addFlag('color', help: 'color output.')
+      ..addOption('sdk', help: 'set a custom SDK path');
     var argResults = argParser.parse(args);
     return Driver(argResults);
   }
