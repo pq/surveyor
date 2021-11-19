@@ -38,8 +38,8 @@ abstract class ErrorReporter {
 
 class OptionsVisitor extends AnalysisOptionsVisitor {
   @override
-  void visit(AnalysisOptionsFile options) {
-    //print('>> visiting: ${options.file}');
+  void visit(AnalysisOptionsFile file) {
+    //print('>> visiting: ${file.file}');
   }
 }
 

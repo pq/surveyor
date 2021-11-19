@@ -108,7 +108,7 @@ class _SourceVisitor extends GeneralizingAstVisitor {
     ++indent;
     node.visitChildren(this);
     --indent;
-    return null;
+    return;
   }
 
   void write(AstNode node) {

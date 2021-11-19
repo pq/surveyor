@@ -108,7 +108,7 @@ class ApiUseCollector extends RecursiveAstVisitor
     var lineInfo = this.lineInfo;
     if (lineInfo == null) return;
 
-    var location;
+    CharacterLocation? location;
     var name = node.methodName.name;
     if (name == 'transform' || name == 'pipe') {
       var type = node.realTarget?.staticType?.element?.name;

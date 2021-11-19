@@ -16,4 +16,5 @@ dependencies:
       ref: 7ffa98e549aa88c5beabde7aec30d44dd1323c3b
 
 dev_dependencies:
+  lints: ^1.0.0
   test: ^1.14.0
