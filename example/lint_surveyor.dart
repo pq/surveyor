@@ -44,7 +44,7 @@ void main(List<String> args) async {
               (f) => !path.basename(f.path).startsWith('.') && f is Directory)
           .map((f) => f.path)
           .toList()
-            ..sort();
+        ..sort();
       dirCount = args.length;
       print('(Found $dirCount subdirectories.)');
     }
