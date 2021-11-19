@@ -8,3 +8,6 @@ dependencies:
   analyzer: ^2.7.0
   surveyor:
     path: ../..
+
+dev_dependencies:
+  lints: ^1.0.0
