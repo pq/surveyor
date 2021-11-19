@@ -190,7 +190,9 @@ class Driver {
               try {
                 var result = resolveUnits
                     ? await context.currentSession.getResolvedUnit(filePath)
-                    : context.currentSession.getParsedUnit(filePath);
+                        as ResolvedUnitResult
+                    : context.currentSession.getParsedUnit(filePath)
+                        as ParsedUnitResult;
 
                 var visitor = this.visitor;
                 if (visitor != null) {
@@ -205,7 +207,7 @@ class Driver {
                   if (result is ParsedUnitResult) {
                     result.unit.accept(visitor);
                   } else if (result is ResolvedUnitResult) {
-                    result.unit?.accept(visitor);
+                    result.unit.accept(visitor);
                   }
                 }
               } catch (e) {
