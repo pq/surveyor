@@ -42,7 +42,7 @@ void main(List<String> args) async {
               (f) => !path.basename(f.path).startsWith('.') && f is Directory)
           .map((f) => f.path)
           .toList()
-            ..sort();
+        ..sort();
       print('(Found ${args.length} subdirectories.)');
     }
     dirCount = args.length;

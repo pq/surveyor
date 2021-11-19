@@ -354,9 +354,9 @@ class HumanErrorFormatter extends ErrorFormatter {
       message = message.substring(0, message.length - 1);
     }
     String sourcePath;
-    if (source.uriKind == UriKind.DART_URI) {
+    if (source.uri.isScheme('dart')) {
       sourcePath = source.uri.toString();
-    } else if (source.uriKind == UriKind.PACKAGE_URI) {
+    } else if (source.uri.isScheme('package')) {
       sourcePath = _relative(source.fullName);
       if (sourcePath == source.fullName) {
         // If we weren't able to shorten the path name, use the package: version.
