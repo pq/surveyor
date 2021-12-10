@@ -36,7 +36,7 @@ WorkspacePackage? getPackage(CompilationUnit unit) {
   if (element == null) {
     return null;
   }
-  var libraryPath = element.library.source.source.fullName;
+  var libraryPath = element.library.source.fullName;
   var workspace = element.session.analysisContext.contextRoot.workspace;
   return workspace.findPackageFor(libraryPath);
 }

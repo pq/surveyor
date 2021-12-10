@@ -148,7 +148,6 @@ class Driver {
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
-        // todo(pq):replace w/ AnalysisContextCollection post analyzer 1.4.0.
         var collection = AnalysisContextCollection(
           includedPaths: [root],
           excludedPaths: excludedPaths.map((p) => path.join(root, p)).toList(),
