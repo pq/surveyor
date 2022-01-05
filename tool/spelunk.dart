@@ -70,6 +70,21 @@ class Spelunker {
   }
 }
 
+class _ErrorListener implements AnalysisErrorListener {
+  final errors = <AnalysisError>[];
+
+  @override
+  void onError(AnalysisError error) {
+    errors.add(error);
+  }
+
+  void throwIfErrors() {
+    if (errors.isNotEmpty) {
+      throw Exception(errors);
+    }
+  }
+}
+
 class _SourceVisitor extends GeneralizingAstVisitor {
   int indent = 0;
 
@@ -119,20 +134,5 @@ class _SourceVisitor extends GeneralizingAstVisitor {
     }
     sink.writeln(
         '${"  " * indent}${asString(node)} ${getTrailingComment(node)}');
-  }
-}
-
-class _ErrorListener implements AnalysisErrorListener {
-  final errors = <AnalysisError>[];
-
-  @override
-  void onError(AnalysisError error) {
-    errors.add(error);
-  }
-
-  void throwIfErrors() {
-    if (errors.isNotEmpty) {
-      throw Exception(errors);
-    }
   }
 }
