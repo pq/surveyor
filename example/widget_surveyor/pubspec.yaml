@@ -5,7 +5,7 @@ environment:
   sdk: '>=2.2.2 <3.0.0'
 
 dependencies:
-  analyzer: ^2.8.0
+  analyzer: ^3.0.0
   cli_util: ^0.3.0
   corpus:
     # update when published
