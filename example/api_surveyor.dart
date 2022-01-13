@@ -42,18 +42,13 @@ void main(List<String> args) async {
     print('Limiting analysis to $_debugLimit packages.');
   }
 
-  var stopwatch = Stopwatch()..start();
-
   var driver = Driver.forArgs(args);
   driver.forceSkipInstall = true;
   driver.showErrors = false;
   driver.resolveUnits = true;
   driver.visitor = ApiUseCollector();
 
-  await driver.analyze();
-
-  print(
-      '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
+  await driver.analyze(displayTiming: true);
 }
 
 int dirCount = 0;

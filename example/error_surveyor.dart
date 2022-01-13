@@ -29,8 +29,6 @@ import 'package:surveyor/src/visitors.dart';
 ///
 /// dart run example/error_surveyor.dart <source dir>
 void main(List<String> args) async {
-  var stopwatch = Stopwatch()..start();
-
   if (args.length == 1) {
     var dir = args[0];
     if (!File('$dir/pubspec.yaml').existsSync()) {
@@ -59,10 +57,7 @@ void main(List<String> args) async {
   // Uncomment to ignore test dirs.
   //driver.excludedPaths = ['test'];
 
-  await driver.analyze();
-
-  print(
-      '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
+  await driver.analyze(displayTiming: true);
 }
 
 int dirCount = 0;
