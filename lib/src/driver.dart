@@ -26,6 +26,7 @@ import 'package:analyzer/src/lint/linter.dart'; // ignore: implementation_import
 import 'package:analyzer/src/lint/registry.dart'; // ignore: implementation_imports
 import 'package:args/args.dart';
 import 'package:cli_util/cli_logging.dart';
+import 'package:linter/src/rules.dart'; // ignore: implementation_imports
 import 'package:path/path.dart' as path;
 
 import 'common.dart';
@@ -39,7 +40,7 @@ class Driver {
   AstVisitor? visitor;
 
   /// Hook to contribute custom options analysis.
-  OptionsVisitor? optionsVisitor;
+  AnalysisOptionsVisitor? optionsVisitor;
 
   /// Hook to contribute custom pubspec analysis.
   PubspecVisitor? pubspecVisitor;
@@ -105,7 +106,16 @@ class Driver {
 
   bool get skipPackageInstall => forceSkipInstall || options.skipInstall;
 
-  Future analyze({bool? forceInstall}) => _analyze(sources);
+  Future analyze({bool displayTiming = false}) {
+    var analysisFuture = _analyze(sources);
+    if (!displayTiming) return analysisFuture;
+
+    var stopwatch = Stopwatch()..start();
+    return analysisFuture.then((value) {
+      print(
+          '(Elapsed time: ${Duration(milliseconds: stopwatch.elapsedMilliseconds)})');
+    });
+  }
 
   /// Hook to influence context post analysis.
   void postAnalyze(SurveyorContext context, DriverCommands callback) {
@@ -145,6 +155,8 @@ class Driver {
     _print('Analyzing...');
 
     var cmd = DriverCommands();
+
+    registerLintRules();
 
     for (var root in analysisRoots) {
       if (cmd.continueAnalyzing) {
@@ -215,14 +227,19 @@ class Driver {
               }
             }
 
-            var optionsVisitor = this.optionsVisitor;
+            var astVisitor = visitor;
+            var optionsVisitor = astVisitor is AnalysisOptionsVisitor
+                ? astVisitor as AnalysisOptionsVisitor
+                : this.optionsVisitor;
             if (optionsVisitor != null) {
-              if (isAnalysisOptionsFileName(filePath)) {
+              if (path.basename(filePath) == 'analysis_options.yaml') {
                 optionsVisitor.visit(AnalysisOptionsFile(filePath));
               }
             }
 
-            var pubspecVisitor = this.pubspecVisitor;
+            var pubspecVisitor = astVisitor is PubspecVisitor
+                ? astVisitor as PubspecVisitor
+                : this.pubspecVisitor;
             if (pubspecVisitor != null) {
               if (path.basename(filePath) == 'pubspec.yaml') {
                 pubspecVisitor.visit(PubspecFile(filePath));
