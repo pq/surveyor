@@ -1,0 +1,11 @@
+name: core_lib_use_test_data
+description: Test data
+version: 0.1.0
+
+# Not intended for publishing.
+publish_to: none
+
+environment:
+  sdk: '>=2.12.0-0 <3.0.0'
+
+
