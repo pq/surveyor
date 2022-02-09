@@ -106,8 +106,10 @@ class Driver {
 
   bool get skipPackageInstall => forceSkipInstall || options.skipInstall;
 
-  Future analyze({bool displayTiming = false}) {
-    var analysisFuture = _analyze(sources);
+  Future analyze(
+      {bool displayTiming = false, bool requirePackagesFile = true}) {
+    var analysisFuture =
+        _analyze(sources, requirePackagesFile: requirePackagesFile);
     if (!displayTiming) return analysisFuture;
 
     var stopwatch = Stopwatch()..start();
@@ -131,18 +133,21 @@ class Driver {
     }
   }
 
-  Future _analyze(List<String> sourceDirs) async {
+  Future _analyze(List<String> sourceDirs,
+      {required bool requirePackagesFile}) async {
     if (sourceDirs.isEmpty) {
       _print('Specify one or more files and directories.');
       return;
     }
     ResourceProvider resourceProvider = PhysicalResourceProvider.INSTANCE;
-    await _analyzeFiles(resourceProvider, sourceDirs);
+    await _analyzeFiles(resourceProvider, sourceDirs,
+        requirePackagesFile: requirePackagesFile);
     _print('Finished.');
   }
 
   Future _analyzeFiles(
-      ResourceProvider resourceProvider, List<String> analysisRoots) async {
+      ResourceProvider resourceProvider, List<String> analysisRoots,
+      {required bool requirePackagesFile}) async {
     if (skipPackageInstall) {
       _print('(Skipping dependency checks.)');
     }
@@ -187,7 +192,7 @@ class Driver {
           }
 
           // Skip analysis if no .packages.
-          if (!package.packagesFile.existsSync()) {
+          if (requirePackagesFile && !package.packagesFile.existsSync()) {
             _print('No .packages in $dir (skipping analysis)');
             continue;
           }
