@@ -126,7 +126,8 @@ class DeprecatedReferenceCollector extends RecursiveAstVisitor
       name += element.displayName;
 
       var location = lineInfo!.getLocation(node.offset);
-      reports.add('$name: $filePath:${location.lineNumber}:${location.columnNumber}');
+      reports.add(
+          '$name: $filePath:${location.lineNumber}:${location.columnNumber}');
     }
 
     ++deprecatedReferenceCount;
