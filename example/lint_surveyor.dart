@@ -108,7 +108,7 @@ class AnalysisAdvisor extends SimpleAstVisitor
     var dirName = path.basename(root.path);
     if (subDir) {
       // Qualify.
-      dirName = '${path.basename(root.parent2.path)}/$dirName';
+      dirName = '${path.basename(root.parent.path)}/$dirName';
     }
     print("Analyzing '$dirName' • [${++count}/$dirCount]...");
   }

@@ -92,9 +92,9 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
   LineInfo? lineInfo;
   Folder? currentFolder;
 
-  _Counts functionTypeAlias = _Counts();
-  _Counts genericTypeAlias = _Counts();
-  _Counts genericFunctionType = _Counts();
+  Counts functionTypeAlias = Counts();
+  Counts genericTypeAlias = Counts();
+  Counts genericFunctionType = Counts();
 
   AnnotationUseCollector();
 
@@ -201,7 +201,7 @@ class AnnotationUseCollector extends RecursiveAstVisitor<void>
   }
 }
 
-class _Counts {
+class Counts {
   /// The number of type aliases that were visited.
   int alias = 0;
 
@@ -212,7 +212,7 @@ class _Counts {
   /// annotations associated with them.
   int parameterWithMetadata = 0;
 
-  _Counts();
+  Counts();
 
   void countParameters(List<FormalParameter> parameters) {
     alias++;

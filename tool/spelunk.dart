@@ -20,6 +20,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/source/line_info.dart';
 import 'package:analyzer/src/dart/scanner/reader.dart';
 import 'package:analyzer/src/dart/scanner/scanner.dart';
 import 'package:analyzer/src/generated/parser.dart' show Parser;
@@ -57,12 +58,12 @@ class Spelunker {
         featureSetForOverriding: featureSet,
       );
     var startToken = scanner.tokenize();
-
     errorListener.throwIfErrors();
 
-    var parser = Parser(stringSource, errorListener, featureSet: featureSet);
+    var lineInfo = LineInfo(scanner.lineStarts);
+    var parser = Parser(stringSource, errorListener,
+        featureSet: featureSet, lineInfo: lineInfo);
     var node = parser.parseCompilationUnit(startToken);
-
     errorListener.throwIfErrors();
 
     var visitor = _SourceVisitor(sink);
