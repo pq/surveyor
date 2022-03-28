@@ -32,6 +32,7 @@ main() async {
   ]);
 
   expectSymbols('dart.core', [
+    'parse',
     'print',
     'override', // annotation
     'Object',
@@ -44,7 +45,7 @@ main() async {
 
   expectSymbols('dart.io', [
     'FileMode', 'File', // classes
-    'APPEND', // top-level variable
+    'exitCode', // top-level variable
   ]);
 
   // todo(pq): no mixins in core libs?
