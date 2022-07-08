@@ -55,7 +55,7 @@ void main(List<String> args) async {
       log.stdout('Parsing results...');
       var results = ResultsReader().parse();
       var indexFile = checkForIndexFile(args);
-      summarizeResults(results, indexFile, log);
+      summarizeResults(results, indexFile!, log);
       return;
     }
   }
@@ -83,7 +83,7 @@ void main(List<String> args) async {
   log.stdout('Done');
 }
 
-IndexFile checkForIndexFile(List<String> args) {
+IndexFile? checkForIndexFile(List<String> args) {
   if (args.length == 2) {
     var filePath = args[1];
     if (path.basename(filePath) == 'index.json') {
@@ -120,9 +120,9 @@ void summarizeResults(
 
   var sorted = totals.entries.toList()
     ..sort((c1, c2) => c2.value.occurrences - c1.value.occurrences);
-  String padClass(String s) => s.padRight(34, ' ');
-  String padCount(String s) => s.padLeft(7, ' ');
-  String padPercent(String s) => s.padLeft(21, ' ');
+  String padClass(String s) => s.padRight(34);
+  String padCount(String s) => s.padLeft(7);
+  String padPercent(String s) => s.padLeft(21);
   log.stdout(
       '| ${padClass("class - (F)lutter")} |   count | % containing projects |');
   log.stdout(
@@ -230,8 +230,8 @@ class TwoGram implements Comparable<TwoGram> {
   final String child;
 
   TwoGram(DartType parent, DartType child)
-      : parent = parent?.element?.name ?? 'null',
-        child = child?.element?.name ?? 'null';
+      : parent = parent.element?.name ?? 'null',
+        child = child.element?.name ?? 'null';
 
   @override
   int get hashCode => parent.hashCode * 13 + child.hashCode;
@@ -277,11 +277,11 @@ class WidgetCollector extends RecursiveAstVisitor
 
   final Logger log;
 
-  String dirName;
+  late String dirName;
 
-  String filePath;
+  late String filePath;
 
-  LineInfo lineInfo;
+  late LineInfo lineInfo;
 
   final String corpusDir;
 
@@ -294,14 +294,16 @@ class WidgetCollector extends RecursiveAstVisitor
   }
 
   String getSignature(DartType type) {
-    var uri = type.element.library.source.uri;
+    Uri? uri;
+
+    uri = type.element!.library!.source.uri;
     if (uri.isScheme('file')) {
-      var converter = type.element.library.session.uriConverter;
-      var path = converter.uriToPath(uri);
+      var converter = type.element!.library!.session.uriConverter;
+      var path = converter.uriToPath(uri)!;
       uri = converter.pathToUri(path);
     }
 
-    var name = type.element.displayName;
+    var name = type.element!.displayName;
     return '$uri#$name';
   }
 
@@ -314,7 +316,7 @@ class WidgetCollector extends RecursiveAstVisitor
 
   @override
   void preAnalysis(SurveyorContext context,
-      {bool subDir, DriverCommands commandCallback}) {
+      {bool? subDir, DriverCommands? commandCallback}) {
     dirName = path.basename(context.analysisContext.contextRoot.root.path);
     log.stdout("Analyzing '$dirName'...");
   }
@@ -329,7 +331,7 @@ class WidgetCollector extends RecursiveAstVisitor
     this.lineInfo = lineInfo;
   }
 
-  void updateRouteCount(DartType type, InstanceCreationExpression node) {
+  void updateRouteCount(DartType? type, InstanceCreationExpression node) {
     if (routes == routesUnreliable) {
       return;
     }
@@ -364,7 +366,7 @@ class WidgetCollector extends RecursiveAstVisitor
     updateRouteCount(type, node);
 
     if (isWidgetType(type)) {
-      var signature = getSignature(type);
+      var signature = getSignature(type!);
       var location = getLocation(node);
       widgets.update(signature, (v) => v..add(location),
           ifAbsent: () => [location]);

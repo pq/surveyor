@@ -2,14 +2,14 @@ name: widget_surveyor
 description: Sample project that performs widget surveying.
 
 environment:
-  sdk: '>=2.2.2 <3.0.0'
+  sdk: ^2.12.0
 
 dependencies:
   analyzer: ^3.0.0
   cli_util: ^0.3.0
   corpus:
     # update when published
-    git: git://github.com/pq/corpus.git
+    git: https://github.com/pq/corpus
   path: ^1.8.0
   surveyor:
     path: ../..
