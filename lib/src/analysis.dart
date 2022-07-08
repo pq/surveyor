@@ -41,7 +41,7 @@ WorkspacePackage? getPackage(CompilationUnit unit) {
   return workspace.findPackageFor(libraryPath);
 }
 
-bool implementsInterface(DartType type, String interface, String library) {
+bool implementsInterface(DartType? type, String interface, String library) {
   if (type is! InterfaceType) {
     return false;
   }
@@ -81,7 +81,7 @@ bool isInterface(InterfaceType type, String interface, String library) =>
 bool isPrivate(SimpleIdentifier identifier) =>
     Identifier.isPrivateName(identifier.name);
 
-bool isWidgetType(DartType type) => implementsInterface(type, 'Widget', '');
+bool isWidgetType(DartType? type) => implementsInterface(type, 'Widget', '');
 
 String _pluralize(String word, int count) => count == 1 ? word : '${word}s';
 
