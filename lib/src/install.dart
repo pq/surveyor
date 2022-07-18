@@ -32,7 +32,8 @@ class Package {
     return {};
   }
 
-  File get packagesFile => File(pathutil.join(dir.path, '.packages'));
+  File get packageConfigFile =>
+      File(pathutil.join(dir.path, '.dart_tool', 'package_config.json'));
 
   Map<dynamic, yaml.YamlNode> get pubspec {
     var file = pubspecFile;
@@ -61,7 +62,7 @@ class Package {
 
 class _Installer {
   bool hasDependenciesInstalled(Package package) =>
-      package.dir.existsSync() && package.packagesFile.existsSync();
+      package.dir.existsSync() && package.packageConfigFile.existsSync();
 
   Future<ProcessResult?> installDependencies(Package package,
       {bool silent = false}) async {
@@ -84,7 +85,7 @@ class _Installer {
     }
 
     _print('Running "pub get" in ${pathutil.basename(sourcePath)}', silent);
-    return Process.run('pub', ['get'],
+    return Process.run('dart', ['pub', 'get'],
         workingDirectory: sourcePath, runInShell: true);
   }
 
