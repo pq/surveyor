@@ -192,8 +192,8 @@ class Driver {
           }
 
           // Skip analysis if no .packages.
-          if (requirePackagesFile && !package.packagesFile.existsSync()) {
-            _print('No .packages in $dir (skipping analysis)');
+          if (requirePackagesFile && !package.packageConfigFile.existsSync()) {
+            _print('No package config file in $dir (skipping analysis)');
             continue;
           }
 
