@@ -42,6 +42,5 @@ jobs:
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
-      # Enable when fixed (https://github.com/pq/surveyor/issues/27)
-      # - name: Run example tests
-      #  run: (cd example/widget_surveyor; dart test)
+      - name: Run example tests
+        run: (cd example/widget_surveyor; dart test)
