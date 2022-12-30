@@ -27,13 +27,13 @@ main() async {
   }
 
   expectSymbols('dart.convert', [
-    'JsonUtf8Encoder', // class, referenced via static field
     'jsonDecode' // top-level function
   ]);
 
   expectSymbols('dart.core', [
     'parse',
     'print',
+    'DateTime', // class, referenced via static field
     'override', // annotation
     'Object',
     'String',

@@ -19,13 +19,13 @@ import 'dart:io';
 
 void main() {
   var x = FileMode.append;
-  var y = int.parse('9', onError: (source) => 0);
+  var y = int.parse('9');
   var f = File('')..writeAsStringSync(jsonDecode(''));
   print(f.length());
 
   var c = HttpClientResponseCompressionState.compressed;
 
-  print(JsonUtf8Encoder.DEFAULT_BUFFER_SIZE);
+  print(DateTime.april);
   print(exitCode);
 }
 

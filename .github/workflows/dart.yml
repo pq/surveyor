@@ -29,9 +29,8 @@ jobs:
       - name: Install package dependencies
         run: dart pub get
       
-      # Needs updating.
-      # - name: Install widget_surveyor example dependencies
-      #  run:  (cd example/widget_surveyor; dart pub get)
+      - name: Install widget_surveyor example dependencies
+        run:  (cd example/widget_surveyor; dart pub get)
 
       - name: Install doc_surveyor example dependencies
         run:  (cd example/doc_surveyor; dart pub get)       
@@ -41,6 +40,9 @@ jobs:
 
       - name: Analyze project source
         run: dart analyze --fatal-infos
+
+      - name: Run core tests
+        run: dart test
 
       # Enable when fixed (https://github.com/pq/surveyor/issues/27)
       # - name: Run example tests
