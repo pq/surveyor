@@ -2,6 +2,8 @@
 Tools for surveying Dart packages.
 
 [![Build Status](https://github.com/pq/surveyor/actions/workflows/dart.yml/badge.svg)](https://github.com/pq/surveyor/actions)
+[![Pub](https://img.shields.io/pub/v/surveyor.svg)](https://pub.dartlang.org/packages/surveyor)
+
 
 **Disclaimer:** This is not an officially supported Google product.
 
