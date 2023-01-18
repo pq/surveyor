@@ -178,7 +178,7 @@ class _Visitor extends RecursiveAstVisitor
     for (var member in node.members) {
       if (member is MethodDeclaration && !isPrivate(member.name)) {
         if (member.isGetter) {
-          getters[member.name.name] = member;
+          getters[member.name.lexeme] = member;
         } else if (member.isSetter) {
           setters.add(member);
         } else {
@@ -197,7 +197,7 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      var getter = getters[setter.name.name];
+      var getter = getters[setter.name.lexeme];
       if (getter == null) {
         var declaredElement = node.declaredElement;
         if (declaredElement != null) {
@@ -205,7 +205,7 @@ class _Visitor extends RecursiveAstVisitor
           // Look for an inherited getter.
           var getter = inheritanceManager.getMember(
             declaredElement.thisType,
-            Name(libraryUri, setter.name.name),
+            Name(libraryUri, setter.name.lexeme),
           );
           if (getter is PropertyAccessorElement) {
             if (getter.documentationComment != null) {
@@ -265,9 +265,9 @@ class _Visitor extends RecursiveAstVisitor
     for (var member in node.declarations) {
       if (member is FunctionDeclaration) {
         var name = member.name;
-        if (!isPrivate(name) && name.name != 'main') {
+        if (!isPrivate(name) && name.lexeme != 'main') {
           if (member.isGetter) {
-            getters[member.name.name] = member;
+            getters[member.name.lexeme] = member;
           } else if (member.isSetter) {
             setters.add(member);
           } else {
@@ -287,7 +287,7 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      var getter = getters[setter.name.name];
+      var getter = getters[setter.name.lexeme];
       if (getter != null && missingDocs.contains(getter)) {
         check(setter);
       }
@@ -354,7 +354,7 @@ class _Visitor extends RecursiveAstVisitor
     for (var member in node.members) {
       if (member is MethodDeclaration && !isPrivate(member.name)) {
         if (member.isGetter) {
-          getters[member.name.name] = member;
+          getters[member.name.lexeme] = member;
         } else if (member.isSetter) {
           setters.add(member);
         } else {
@@ -373,7 +373,7 @@ class _Visitor extends RecursiveAstVisitor
 
     // But only setters whose getter is missing a doc.
     for (var setter in setters) {
-      var getter = getters[setter.name.name];
+      var getter = getters[setter.name.lexeme];
       if (getter != null && missingDocs.contains(getter)) {
         check(setter);
       }
