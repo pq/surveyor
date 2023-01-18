@@ -1,6 +1,6 @@
 name: surveyor
 description: Tools for surveying Dart sources
-version: 0.1.0
+version: 1.0.0-dev.1.0
 homepage: https://github.com/pq/surveyor
 
 # Not intended for publishing.
