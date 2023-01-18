@@ -79,8 +79,7 @@ bool isInterface(InterfaceType type, String interface, String library) =>
     type.element.name == interface && type.element.library.name == library;
 
 /// Check if the given token has a private name.
-bool isPrivate(Token token) =>
-    Identifier.isPrivateName(token.lexeme);
+bool isPrivate(Token token) => Identifier.isPrivateName(token.lexeme);
 
 bool isWidgetType(DartType? type) => implementsInterface(type, 'Widget', '');
 
