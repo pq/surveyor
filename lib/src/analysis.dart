@@ -15,6 +15,7 @@
 import 'dart:io' as io;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart';
 import 'package:analyzer/source/line_info.dart';
@@ -56,11 +57,11 @@ bool implementsInterface(DartType? type, String interface, String library) {
 bool inPrivateMember(AstNode node) {
   var parent = node.parent;
   if (parent is NamedCompilationUnitMember) {
-    return isPrivate(parent.name);
+    return Identifier.isPrivateName(parent.name.lexeme);
   }
   if (parent is ExtensionDeclaration) {
     var parentName = parent.name;
-    return parentName == null || isPrivate(parentName);
+    return parentName == null || Identifier.isPrivateName(parentName.lexeme);
   }
   return false;
 }
@@ -77,9 +78,9 @@ bool isInLibDir(CompilationUnit node, WorkspacePackage package) {
 bool isInterface(InterfaceType type, String interface, String library) =>
     type.element.name == interface && type.element.library.name == library;
 
-/// Check if the given identifier has a private name.
-bool isPrivate(SimpleIdentifier identifier) =>
-    Identifier.isPrivateName(identifier.name);
+/// Check if the given token has a private name.
+bool isPrivate(Token token) =>
+    Identifier.isPrivateName(token.lexeme);
 
 bool isWidgetType(DartType? type) => implementsInterface(type, 'Widget', '');
 
