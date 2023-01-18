@@ -2,7 +2,7 @@ name: widget_surveyor
 description: Sample project that performs widget surveying.
 
 environment:
-  sdk: ^2.12.0
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
   analyzer: ^3.0.0
