@@ -39,10 +39,6 @@ main() async {
     'String',
   ]);
 
-  expectSymbols('dart._http', [
-    'HttpClientResponseCompressionState' // enum
-  ]);
-
   expectSymbols('dart.io', [
     'FileMode', 'File', // classes
     'exitCode', // top-level variable
