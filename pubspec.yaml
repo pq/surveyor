@@ -4,7 +4,7 @@ version: 1.0.0-dev.3.0
 repository: https://github.com/pq/surveyor
 
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '>=2.17.0 <4.0.0'
 
 dependencies:
   analyzer: ^5.4.0
