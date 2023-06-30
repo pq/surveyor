@@ -132,7 +132,7 @@ class LibraryUseCollector extends RecursiveAstVisitor
     if (parent is MethodInvocation) {
       visitMethod(parent);
     } else if (parent is NamedType) {
-      visitTypeElement(parent.name.staticElement);
+      visitTypeElement(parent.element);
     } else if (parent is PrefixedIdentifier) {
       var element = node.staticElement;
       if (element is ClassElement) {
@@ -148,8 +148,11 @@ class LibraryUseCollector extends RecursiveAstVisitor
   }
 
   void visitType(NamedType type) {
-    var typeName = type.name.name;
-    var libraryName = type.name.staticElement?.library?.name;
+    var element = type.element;
+    if (element == null) return;
+    var typeName = element.name;
+    if (typeName == null) return;
+    var libraryName = element.library?.name;
     if (libraryName?.startsWith('dart.') ?? false) {
       add(library: libraryName, symbol: typeName);
     }
