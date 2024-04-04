@@ -287,12 +287,11 @@ class HumanErrorFormatter extends ErrorFormatter {
   // This is a Set in order to de-dup CLI errors.
   Set<CLIError> batchedErrors = {};
 
-  HumanErrorFormatter(StringSink out, AnalysisStats stats,
-      {SeverityProcessor? severityProcessor,
+  HumanErrorFormatter(super.out, super.stats,
+      {super.severityProcessor,
       bool ansiColor = false,
       this.displayCorrections = false})
-      : ansi = AnsiLogger(ansiColor),
-        super(out, stats, severityProcessor: severityProcessor);
+      : ansi = AnsiLogger(ansiColor);
 
   @override
   void flush() {
